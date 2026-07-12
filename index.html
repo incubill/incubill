@@ -439,6 +439,28 @@
     </button>
   </div>
 
+  <!-- VIDEO EXPLAINER -->
+  <div class="card-section">
+    <h2><i class="fa-solid fa-circle-play me-2"></i><span data-i18n="videoTitle">See How It Works</span></h2>
+    <p class="text-muted" style="font-size:.9rem;" data-i18n="videoSubtitle">A 75-second walkthrough of how Incubill helps you quote jobs faster and grow your business.</p>
+    <div class="ratio ratio-16x9">
+      <!--
+        DEVELOPER NOTE: replace YOUR_YOUTUBE_VIDEO_ID below with the real
+        ID once your explainer video is uploaded (unlisted or public is
+        fine). The ID is the part after "v=" in a YouTube URL, e.g. for
+        https://www.youtube.com/watch?v=dQw4w9WgXcQ the ID is dQw4w9WgXcQ.
+      -->
+      <iframe
+        src="https://www.youtube-nocookie.com/embed/YOUR_YOUTUBE_VIDEO_ID"
+        title="Incubill — How It Works"
+        frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        referrerpolicy="strict-origin-when-cross-origin"
+        allowfullscreen>
+      </iframe>
+    </div>
+  </div>
+
   <!-- WHY INCUBILL -->
   <div class="card-section">
     <h2><i class="fa-solid fa-star me-2"></i><span data-i18n="whyTitle">Why Incubill</span></h2>
@@ -777,6 +799,8 @@ const TRANSLATIONS = {
     confirmReset: "Are you sure you want to reset the form? All entered data will be lost.",
     confirmTradeSwitch: "Switch trade and load its sample line items? Your current rows will be replaced.",
     whyTitle: "Why Incubill",
+    videoTitle: "See How It Works",
+    videoSubtitle: "A 75-second walkthrough of how Incubill helps you quote jobs faster and grow your business.",
     whyAgenticTitle: "Agentic AI & Hyper-Personalization",
     whyAgenticDesc: "Every estimate adapts itself to your trade, your client's currency, and their language automatically — no manual setup, every time.",
     whyConvTitle: "Conversational Marketing",
