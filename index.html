@@ -8,6 +8,7 @@
 <meta name="keywords" content="plumber estimate generator, electrician quote tool, contractor PDF estimate, free estimate maker, HVAC quote software, handyman invoice tool">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://incubill.com/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%231a2a4a'/%3E%3Ctext x='50' y='68' font-size='58' font-family='Arial, sans-serif' font-weight='bold' fill='%23ffb400' text-anchor='middle'%3EI%3C/text%3E%3C/svg%3E">
 
 <!-- Open Graph / social preview -->
 <meta property="og:type" content="website">
@@ -270,7 +271,7 @@
       <option value="ZAR">ZAR – South African Rand (R)</option>
       <option value="SGD">SGD – Singapore Dollar (S$)</option>
     </select>
-    <span id="currencyDetectNote" class="text-muted" style="font-size:.75rem;"></span>
+    <span id="currencyDetectNote" style="font-size:.75rem;color:#495057;"></span>
   </div>
   <div>
     <label for="languageSelect"><i class="fa-solid fa-globe me-1"></i>Language:</label>
@@ -285,7 +286,7 @@
       <option value="hi">हिन्दी (Hindi) — screen only</option>
       <option value="ar">العربية (Arabic) — screen only</option>
     </select>
-    <span id="languageDetectNote" class="text-muted" style="font-size:.75rem;"></span>
+    <span id="languageDetectNote" style="font-size:.75rem;color:#495057;"></span>
   </div>
 </div>
 
@@ -299,18 +300,18 @@
   <!-- YOUR BUSINESS INFO -->
   <div class="card-section">
     <h2><i class="fa-solid fa-building me-2"></i><span data-i18n="businessInfoTitle">Your Business Details</span></h2>
-    <p class="text-muted" style="font-size:.85rem;" data-i18n="businessInfoNote">This appears at the top of every PDF estimate instead of a placeholder. Fill it in once — it's remembered for this session.</p>
+    <p style="font-size:.85rem;color:#495057;" data-i18n="businessInfoNote">This appears at the top of every PDF estimate instead of a placeholder. Fill it in once — it's remembered for this session.</p>
     <div class="row g-3">
       <div class="col-md-4">
-        <label class="form-label" data-i18n="businessName">Company Name</label>
+        <label class="form-label" for="businessName" data-i18n="businessName">Company Name</label>
         <input type="text" id="businessName" class="form-control" placeholder="Your Company Name">
       </div>
       <div class="col-md-4">
-        <label class="form-label" data-i18n="businessAddress">Company Address</label>
+        <label class="form-label" for="businessAddress" data-i18n="businessAddress">Company Address</label>
         <input type="text" id="businessAddress" class="form-control" placeholder="123 Pipe Lane">
       </div>
       <div class="col-md-4">
-        <label class="form-label" data-i18n="businessPhone">Phone Number</label>
+        <label class="form-label" for="businessPhone" data-i18n="businessPhone">Phone Number</label>
         <input type="text" id="businessPhone" class="form-control" placeholder="(555) 123-4567">
       </div>
     </div>
@@ -321,23 +322,23 @@
     <h2><i class="fa-solid fa-user me-2"></i><span data-i18n="clientInfoTitle">Client Information</span></h2>
     <div class="row g-3">
       <div class="col-md-4">
-        <label class="form-label"><span data-i18n="clientName">Client Name</span> <span class="text-danger">*</span></label>
+        <label class="form-label" for="clientName"><span data-i18n="clientName">Client Name</span> <span class="text-danger">*</span></label>
         <input type="text" id="clientName" class="form-control" required>
       </div>
       <div class="col-md-4">
-        <label class="form-label"><span data-i18n="clientEmail">Client Email</span> <span class="text-danger">*</span></label>
+        <label class="form-label" for="clientEmail"><span data-i18n="clientEmail">Client Email</span> <span class="text-danger">*</span></label>
         <input type="email" id="clientEmail" class="form-control" required>
       </div>
       <div class="col-md-4">
-        <label class="form-label" data-i18n="clientAddress">Client Address</label>
+        <label class="form-label" for="clientAddress" data-i18n="clientAddress">Client Address</label>
         <input type="text" id="clientAddress" class="form-control">
       </div>
       <div class="col-md-4">
-        <label class="form-label" data-i18n="estimateDate">Estimate Date</label>
+        <label class="form-label" for="estimateDate" data-i18n="estimateDate">Estimate Date</label>
         <input type="date" id="estimateDate" class="form-control">
       </div>
       <div class="col-md-4">
-        <label class="form-label" data-i18n="estimateNumber">Estimate Number</label>
+        <label class="form-label" for="estimateNumber" data-i18n="estimateNumber">Estimate Number</label>
         <input type="text" id="estimateNumber" class="form-control" readonly>
       </div>
     </div>
@@ -350,12 +351,12 @@
       <table class="table job-table align-middle">
         <thead>
           <tr>
-            <th>#</th>
-            <th data-i18n="description">Description</th>
-            <th style="width:100px;" data-i18n="quantity">Quantity</th>
-            <th style="width:130px;" id="unitPriceHeader">Unit Price ($)</th>
-            <th style="width:110px;" id="totalHeader">Total ($)</th>
-            <th style="width:40px;"></th>
+            <th scope="col">#</th>
+            <th scope="col" data-i18n="description">Description</th>
+            <th scope="col" style="width:100px;" data-i18n="quantity">Quantity</th>
+            <th scope="col" style="width:130px;" id="unitPriceHeader">Unit Price ($)</th>
+            <th scope="col" style="width:110px;" id="totalHeader">Total ($)</th>
+            <th scope="col" style="width:40px;"><span class="visually-hidden" data-i18n="rowActions">Actions</span></th>
           </tr>
         </thead>
         <tbody id="jobTableBody"></tbody>
@@ -378,13 +379,14 @@
             <label class="form-check-label" for="travelFee" data-i18n="travelFee">Add Travel Fee</label>
           </div>
           <div class="input-group input-group-sm" style="max-width:140px;">
-            <span class="input-group-text" id="travelFeeCurrencyLabel">$</span>
+            <label class="visually-hidden" for="travelFeeAmount" data-i18n="travelFeeAmountLabel">Travel fee amount</label>
+            <span class="input-group-text" id="travelFeeCurrencyLabel" aria-hidden="true">$</span>
             <input type="number" id="travelFeeAmount" class="form-control" value="30.00" min="0" step="0.01" onchange="calculateTotals()" oninput="calculateTotals()">
           </div>
         </div>
 
         <div class="mb-3">
-          <label class="form-label" data-i18n="taxRate">Tax Rate</label>
+          <label class="form-label" for="taxRate" data-i18n="taxRate">Tax Rate</label>
           <select id="taxRate" class="form-select" onchange="calculateTotals()">
             <option value="0">0%</option>
             <option value="0.05">5%</option>
@@ -395,11 +397,11 @@
 
         <div class="row">
           <div class="col-6 mb-2">
-            <label class="form-label" data-i18n="subtotal">Subtotal</label>
+            <label class="form-label" for="subtotal" data-i18n="subtotal">Subtotal</label>
             <input type="text" id="subtotal" class="form-control" readonly>
           </div>
           <div class="col-6 mb-2">
-            <label class="form-label" data-i18n="taxAmount">Tax Amount</label>
+            <label class="form-label" for="taxAmount" data-i18n="taxAmount">Tax Amount</label>
             <input type="text" id="taxAmount" class="form-control" readonly>
           </div>
         </div>
@@ -408,7 +410,7 @@
 
     <div class="col-lg-5 mb-4">
       <div class="grand-total-box h-100 d-flex flex-column justify-content-center text-center">
-        <div class="text-muted mb-1" data-i18n="grandTotalLabel">Grand Total</div>
+        <div class="mb-1" style="color:#3d4854;" data-i18n="grandTotalLabel">Grand Total</div>
         <div class="amount" id="grandTotal">$0.00</div>
       </div>
     </div>
@@ -754,6 +756,10 @@ const TRANSLATIONS = {
     unitPriceHeader: "Unit Price ({symbol})",
     totalHeader: "Total ({symbol})",
     addRow: "Add Row",
+    rowActions: "Actions",
+    rowLabelPrefix: "row",
+    deleteRowLabel: "Delete row",
+    travelFeeAmountLabel: "Travel fee amount",
     summaryTitle: "Summary & Options",
     travelFee: "Add Travel Fee",
     taxRate: "Tax Rate",
@@ -1307,15 +1313,16 @@ function generateEstimateNumber() {
 function addRow(desc = "", qty = 1, price = 0) {
   rowCounter++;
   const tbody = document.getElementById("jobTableBody");
+  const rowNum = tbody.children.length + 1;
   const tr = document.createElement("tr");
   tr.dataset.rowId = rowCounter;
   tr.innerHTML = `
-    <td class="row-index">${tbody.children.length + 1}</td>
-    <td><input type="text" class="form-control desc-input" value="${desc}"></td>
-    <td><input type="number" class="form-control qty-input" value="${qty}" min="0" step="1" onchange="calculateTotals()" oninput="calculateTotals()"></td>
-    <td><input type="number" class="form-control price-input" value="${price.toFixed ? price.toFixed(2) : price}" min="0" step="0.01" onchange="calculateTotals()" oninput="calculateTotals()"></td>
+    <td class="row-index">${rowNum}</td>
+    <td><input type="text" class="form-control desc-input" value="${desc}" aria-label="${t("description")} — ${t("rowLabelPrefix")} ${rowNum}"></td>
+    <td><input type="number" class="form-control qty-input" value="${qty}" min="0" step="1" onchange="calculateTotals()" oninput="calculateTotals()" aria-label="${t("quantity")} — ${t("rowLabelPrefix")} ${rowNum}"></td>
+    <td><input type="number" class="form-control price-input" value="${price.toFixed ? price.toFixed(2) : price}" min="0" step="0.01" onchange="calculateTotals()" oninput="calculateTotals()" aria-label="${t("unitPriceHeader").replace(/\s*\(.*\)/, "")} — ${t("rowLabelPrefix")} ${rowNum}"></td>
     <td class="row-total fw-semibold">${formatMoney(0)}</td>
-    <td><button class="btn btn-sm btn-outline-danger" onclick="deleteRow(this)"><i class="fa-solid fa-xmark"></i></button></td>
+    <td><button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteRow(this)" aria-label="${t("deleteRowLabel")} ${rowNum}"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></td>
   `;
   tbody.appendChild(tr);
   calculateTotals();
