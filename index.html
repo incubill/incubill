@@ -231,7 +231,7 @@
 <!-- HEADER -->
 <header class="app-header d-flex flex-wrap justify-content-between align-items-center gap-2">
   <div>
-    <h1><i id="tradeIcon" class="fa-solid fa-wrench me-2"></i>Incubill <span id="tradeSubtitle" class="fw-normal">· Plumber's Edition</span></h1>
+    <h1><i id="tradeIcon" class="fa-solid fa-toolbox me-2"></i>Incubill <span id="tradeSubtitle" class="fw-normal">· All-Trades Estimate Tool</span></h1>
     <div class="subtitle" data-i18n="headerTagline">Professional PDF estimates in minutes</div>
   </div>
   <div>
@@ -732,6 +732,7 @@ const LATIN_SCRIPT_LANGS = ["en", "es", "fr", "de", "pt", "it"];
 const TRANSLATIONS = {
   en: {
     headerTagline: "Professional PDF estimates in minutes",
+    genericHeaderTagline: "All-Trades Estimate Tool",
     subscribeBtn: "Subscribe Now (7-Day Free Trial)",
     subscribedDefault: "Thank you for subscribing! You now have full access.",
     subscribedSuccess: "🎉 Thank you for subscribing! You now have full access to Incubill.",
@@ -1147,6 +1148,7 @@ function applyLanguage() {
 
   // The subscribed banner (if visible) and currency-dependent headers
   // both contain translated + dynamic content, so refresh them too.
+  updateHeaderText();
   refreshCurrencyDisplay();
 }
 
@@ -1243,6 +1245,24 @@ const TRADES = {
 
 let currentTrade = "plumber";
 
+let headerTradeKey = null; // null = generic "all trades" header; set once user picks a trade
+
+function updateHeaderText() {
+  const iconEl = document.getElementById("tradeIcon");
+  const subtitleEl = document.getElementById("tradeSubtitle");
+
+  if (headerTradeKey && TRADES[headerTradeKey]) {
+    const trade = TRADES[headerTradeKey];
+    iconEl.className = `fa-solid ${trade.icon} me-2`;
+    subtitleEl.textContent = `· ${trade.label}`;
+    document.title = `Incubill · ${trade.label}`;
+  } else {
+    iconEl.className = "fa-solid fa-toolbox me-2";
+    subtitleEl.textContent = `· ${t("genericHeaderTagline")}`;
+    document.title = `Incubill · ${t("genericHeaderTagline")}`;
+  }
+}
+
 function applyTrade(tradeKey, isInitialLoad = false) {
   const previousTrade = currentTrade;
   const trade = TRADES[tradeKey];
@@ -1255,9 +1275,14 @@ function applyTrade(tradeKey, isInitialLoad = false) {
   }
 
   currentTrade = tradeKey;
-  document.getElementById("tradeIcon").className = `fa-solid ${trade.icon} me-2`;
-  document.getElementById("tradeSubtitle").textContent = `· ${trade.label}`;
-  document.title = `Incubill · ${trade.label}`;
+  // The header stays generic ("Incubill · All-Trades Edition") on the
+  // initial page load, and only switches to a trade-specific label once
+  // the person actually picks one from the dropdown themselves — this
+  // keeps first-time visitors from thinking the tool is plumbing-only.
+  if (!isInitialLoad) {
+    headerTradeKey = tradeKey;
+  }
+  updateHeaderText();
 
   document.getElementById("jobTableBody").innerHTML = "";
   trade.rows.forEach(r => addRow(r.desc, r.qty, r.price));
