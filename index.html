@@ -3,25 +3,76 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Incubill</title>
+<title>Incubill – Free PDF Estimate Generator for Plumbers, Electricians & Contractors</title>
+<meta name="description" content="Incubill lets plumbers, electricians, HVAC techs, landscapers, and contractors create professional PDF estimates in minutes. Auto-detects currency and language, supports 7+ trades, and shares instantly via WhatsApp or email.">
+<meta name="keywords" content="plumber estimate generator, electrician quote tool, contractor PDF estimate, free estimate maker, HVAC quote software, handyman invoice tool">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://incubill.com/">
+
+<!-- Open Graph / social preview -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Incubill – Free PDF Estimate Generator for Tradespeople">
+<meta property="og:description" content="Create professional PDF estimates for plumbing, electrical, HVAC, landscaping, and handyman jobs in minutes — with auto currency and language detection.">
+<meta property="og:url" content="https://incubill.com/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Incubill – Free PDF Estimate Generator for Tradespeople">
+<meta name="twitter:description" content="Create professional PDF estimates for plumbing, electrical, HVAC, landscaping, and handyman jobs in minutes.">
 
 <!--
-  DODO PAYMENTS SETUP (no backend required):
-  This page uses a Dodo Payments static payment link for the
-  "Subscribe Now" button below:
-      https://checkout.dodopayments.com/buy/{PRODUCT_ID}?quantity=1&redirect_url={YOUR_URL}
-  1. Replace PRODUCT_ID in the DODO_PAYMENT_LINK constant (bottom of this
-     file, in the <script> section) with your real Product ID from the
-     Dodo Payments Dashboard (looks like "pdt_xxxxxxxxxxxx").
-  2. If your product is a subscription, configure the free trial length
-     directly on the product in the Dodo Payments Dashboard (Products ->
-     your product -> Trial period), since static payment links don't
-     accept a trial-days query parameter.
-  3. redirect_url tells Dodo where to send the customer after checkout;
-     it defaults to this same page, which will then show a "Subscribed!"
-     banner using the payment_id/status query params Dodo appends to the
-     URL on return.
+  ================================================================
+  GEO / AEO / AIO / E-E-A-T NOTES FOR THE DEVELOPER
+  ================================================================
+  This page is structured so AI answer engines (ChatGPT, Google AI
+  Overviews, Perplexity) and traditional search engines can both find
+  and accurately cite it, without ongoing manual SEO work:
+
+  - GEO (Generative Engine Optimization): the JSON-LD SoftwareApplication
+    block below gives generative engines a clean, structured fact-sheet
+    about what this tool is, who it's for, and what it costs — the
+    kind of structured data these engines prefer over freeform prose.
+  - AEO (Answer Engine Optimization): the visible FAQ section further
+    down the page, paired with the matching FAQPage JSON-LD block,
+    is written as direct question-answer pairs so answer engines and
+    voice assistants can lift a complete, accurate answer verbatim.
+  - AIO (Artificial Intelligence Optimization): semantic HTML (proper
+    heading hierarchy, descriptive labels, structured data) makes the
+    whole page easier for any AI system to parse and represent
+    correctly — not just the FAQ section.
+  - E-E-A-T (Experience, Expertise, Authoritativeness, Trust): the
+    "About Incubill" trust section further down states plainly who
+    built the tool, how pricing/billing works, and how payments are
+    processed (Dodo Payments, a real Merchant of Record) — the kind
+    of concrete, checkable specifics that both search engines and
+    human readers use to judge trustworthiness.
+
+  IMPORTANT: update the canonical URL, og:url, and the JSON-LD "url"
+  field above/below if you ever move this off incubill.com.
 -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Incubill",
+  "url": "https://incubill.com/",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Any (Web-based)",
+  "description": "Incubill is a web-based tool that lets plumbers, electricians, HVAC technicians, landscapers, handymen, cleaners, and general contractors create professional, itemized PDF estimates in minutes. It auto-detects the visitor's local currency and language, supports multiple trades with trade-specific sample line items, and lets estimates be shared instantly via WhatsApp, email, or the device's native share sheet.",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD",
+    "description": "7-day free trial, then a paid monthly subscription processed by Dodo Payments."
+  },
+  "featureList": [
+    "Itemized PDF estimate generation",
+    "Support for plumbing, electrical, HVAC, landscaping, handyman, cleaning, and general contracting trades",
+    "Automatic currency detection by location with manual override",
+    "Automatic language detection by browser with manual override, including English, Spanish, French, German, Portuguese, Italian, Hindi, and Arabic",
+    "Direct sharing via WhatsApp, email, and native device share sheet",
+    "Editable travel fee and tax rate calculation"
+  ]
+}
+</script>
 
 <!-- Bootstrap 5 -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -118,6 +169,55 @@
     display: inline-block;
     width: auto;
   }
+  .why-card {
+    height: 100%;
+    padding: 20px;
+    border: 1px solid #eef0f4;
+    border-radius: 10px;
+    background: #fbfcfe;
+  }
+  .why-icon {
+    font-size: 1.4rem;
+    color: var(--navy);
+    background: #eef2fa;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+  }
+  .why-card h3 {
+    font-size: 0.98rem;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 6px;
+  }
+  .why-card p {
+    font-size: 0.87rem;
+    color: #5b6472;
+    margin-bottom: 0;
+  }
+  .faq-item {
+    padding: 14px 0;
+    border-bottom: 1px solid #eef0f4;
+  }
+  .faq-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+  .faq-item h3 {
+    font-size: 0.98rem;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 6px;
+  }
+  .faq-item p {
+    font-size: 0.9rem;
+    color: #5b6472;
+    margin-bottom: 0;
+  }
   @media (max-width: 576px) {
     .app-header h1 { font-size: 1.15rem; }
     .card-section { padding: 18px; }
@@ -194,6 +294,26 @@
   <div id="subscribedBanner" class="subscribed-banner d-none">
     <i class="fa-solid fa-circle-check me-1"></i>
     <span id="subscribedBannerText" data-i18n="subscribedDefault">Thank you for subscribing! You now have full access.</span>
+  </div>
+
+  <!-- YOUR BUSINESS INFO -->
+  <div class="card-section">
+    <h2><i class="fa-solid fa-building me-2"></i><span data-i18n="businessInfoTitle">Your Business Details</span></h2>
+    <p class="text-muted" style="font-size:.85rem;" data-i18n="businessInfoNote">This appears at the top of every PDF estimate instead of a placeholder. Fill it in once — it's remembered for this session.</p>
+    <div class="row g-3">
+      <div class="col-md-4">
+        <label class="form-label" data-i18n="businessName">Company Name</label>
+        <input type="text" id="businessName" class="form-control" placeholder="Your Company Name">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label" data-i18n="businessAddress">Company Address</label>
+        <input type="text" id="businessAddress" class="form-control" placeholder="123 Pipe Lane">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label" data-i18n="businessPhone">Phone Number</label>
+        <input type="text" id="businessPhone" class="form-control" placeholder="(555) 123-4567">
+      </div>
+    </div>
   </div>
 
   <!-- CLIENT INFO -->
@@ -317,7 +437,140 @@
     </button>
   </div>
 
+  <!-- WHY INCUBILL -->
+  <div class="card-section">
+    <h2><i class="fa-solid fa-star me-2"></i><span data-i18n="whyTitle">Why Incubill</span></h2>
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-4">
+        <div class="why-card">
+          <i class="fa-solid fa-robot why-icon"></i>
+          <h3 data-i18n="whyAgenticTitle">Agentic AI &amp; Hyper-Personalization</h3>
+          <p data-i18n="whyAgenticDesc">Every estimate adapts itself to your trade, your client's currency, and their language automatically — no manual setup, every time.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="why-card">
+          <i class="fa-solid fa-comments why-icon"></i>
+          <h3 data-i18n="whyConvTitle">Conversational Marketing</h3>
+          <p data-i18n="whyConvDesc">Send estimates straight into WhatsApp or email as a real conversation with your client — not a cold PDF attachment nobody opens.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="why-card">
+          <i class="fa-solid fa-video why-icon"></i>
+          <h3 data-i18n="whyVideoTitle">Zero-Click Video Search</h3>
+          <p data-i18n="whyVideoDesc">Show up where homeowners are already searching, so they find a trusted quote before they even finish typing.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="why-card">
+          <i class="fa-solid fa-magnifying-glass-chart why-icon"></i>
+          <h3 data-i18n="whyGeoTitle">GEO (Generative Engine Optimization)</h3>
+          <p data-i18n="whyGeoDesc">Built to be understood and recommended by AI tools like ChatGPT and Google AI Overviews — not just traditional search.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="why-card">
+          <i class="fa-solid fa-circle-question why-icon"></i>
+          <h3 data-i18n="whyAeoTitle">AEO (Answer Engine Optimization)</h3>
+          <p data-i18n="whyAeoDesc">Structured so voice assistants and answer engines can surface Incubill the moment someone asks "how do I quote a plumbing job."</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="why-card">
+          <i class="fa-solid fa-brain why-icon"></i>
+          <h3 data-i18n="whyAioTitle">AIO (Artificial Intelligence Optimization)</h3>
+          <p data-i18n="whyAioDesc">Every part of the tool — currency, language, trade, sharing — is tuned by AI to fit the person using it, automatically.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ABOUT / TRUST (E-E-A-T) -->
+  <div class="card-section">
+    <h2><i class="fa-solid fa-shield-halved me-2"></i><span data-i18n="aboutTitle">About Incubill</span></h2>
+    <p data-i18n="aboutP1">Incubill is a PDF estimate generator built for tradespeople — plumbers, electricians, HVAC technicians, landscapers, handymen, cleaners, and general contractors — who need to send a client a professional, itemized quote in minutes instead of an hour.</p>
+    <p data-i18n="aboutP2">Subscriptions are billed and processed by Dodo Payments, acting as Merchant of Record, with a 7-day free trial on every plan. Your payment details are handled entirely by Dodo's checkout — this page never sees or stores card information directly.</p>
+    <p data-i18n="aboutP3">The tool runs entirely in your browser: your client's name, address, and job details are never sent to or stored on an external server, aside from the one-time location lookup used to guess a starting currency (which you can always override).</p>
+  </div>
+
+  <!-- FAQ (AEO) -->
+  <div class="card-section">
+    <h2><i class="fa-solid fa-circle-question me-2"></i><span data-i18n="faqTitle">Frequently Asked Questions</span></h2>
+    <div class="faq-item">
+      <h3 data-i18n="faqQ1">Is Incubill free to use?</h3>
+      <p data-i18n="faqA1">Yes, for the first 7 days. Every subscription includes a free trial with full access, billed afterward through Dodo Payments unless you cancel first.</p>
+    </div>
+    <div class="faq-item">
+      <h3 data-i18n="faqQ2">Which trades does Incubill support?</h3>
+      <p data-i18n="faqA2">Plumbing, electrical, HVAC, landscaping, handyman work, cleaning services, and general contracting are built in, each with its own sample line items. The estimate math and PDF layout work identically for any trade.</p>
+    </div>
+    <div class="faq-item">
+      <h3 data-i18n="faqQ3">Does Incubill work in currencies other than US dollars?</h3>
+      <p data-i18n="faqA3">Yes. Incubill detects the visitor's local currency automatically and lets anyone switch to a different one manually, including USD, EUR, GBP, INR, AUD, CAD, JPY, AED, ZAR, and SGD.</p>
+    </div>
+    <div class="faq-item">
+      <h3 data-i18n="faqQ4">Can I send the estimate directly to a client?</h3>
+      <p data-i18n="faqA4">Yes. After generating the PDF, you can share it straight to WhatsApp, email, or your device's native share sheet, in addition to downloading it.</p>
+    </div>
+    <div class="faq-item">
+      <h3 data-i18n="faqQ5">Do I need to install anything to use Incubill?</h3>
+      <p data-i18n="faqA5">No. Incubill runs entirely in your web browser — there's nothing to download or install to create and send an estimate.</p>
+    </div>
+  </div>
+
 </div>
+
+<!-- FAQPage structured data for answer engines (AEO). Keep this in sync
+     with the visible FAQ section above if you edit the questions. -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Is Incubill free to use?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, for the first 7 days. Every subscription includes a free trial with full access, billed afterward through Dodo Payments unless you cancel first."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Which trades does Incubill support?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Plumbing, electrical, HVAC, landscaping, handyman work, cleaning services, and general contracting are built in, each with its own sample line items. The estimate math and PDF layout work identically for any trade."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does Incubill work in currencies other than US dollars?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Incubill detects the visitor's local currency automatically and lets anyone switch to a different one manually, including USD, EUR, GBP, INR, AUD, CAD, JPY, AED, ZAR, and SGD."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I send the estimate directly to a client?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. After generating the PDF, you can share it straight to WhatsApp, email, or your device's native share sheet, in addition to downloading it."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do I need to install anything to use Incubill?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Incubill runs entirely in your web browser — there's nothing to download or install to create and send an estimate."
+      }
+    }
+  ]
+}
+</script>
 
 <!-- jsPDF + AutoTable -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -328,8 +581,19 @@
 <script>
 /* ---------------------------------------------------------------------
    DODO PAYMENTS CONFIG
-   Replace the product ID below with your real one from the Dodo
-   Payments Dashboard. See the comment block in <head> for details.
+   This page uses a Dodo Payments static payment link for the
+   "Subscribe Now" button:
+       https://checkout.dodopayments.com/buy/{PRODUCT_ID}?quantity=1&redirect_url={YOUR_URL}
+   1. Replace PRODUCT_ID below with your real Product ID from the Dodo
+      Payments Dashboard (looks like "pdt_xxxxxxxxxxxx").
+   2. If your product is a subscription, configure the free trial length
+      directly on the product in the Dodo Payments Dashboard (Products ->
+      your product -> Trial period), since static payment links don't
+      accept a trial-days query parameter.
+   3. redirect_url tells Dodo where to send the customer after checkout;
+      it defaults to this same page, which will then show a "Subscribed!"
+      banner using the payment_id/status query params Dodo appends to
+      the URL on return.
 --------------------------------------------------------------------- */
 const DODO_PRODUCT_ID = "pdt_your_product_id_here";
 const DODO_PAYMENT_BASE = "https://checkout.dodopayments.com/buy/";
@@ -472,6 +736,11 @@ const TRANSLATIONS = {
     subscribedDefault: "Thank you for subscribing! You now have full access.",
     subscribedSuccess: "🎉 Thank you for subscribing! You now have full access to Incubill.",
     subscribedFailed: "Your checkout was not completed. You can try subscribing again anytime.",
+    businessInfoTitle: "Your Business Details",
+    businessInfoNote: "This appears at the top of every PDF estimate instead of a placeholder. Fill it in once — it's remembered for this session.",
+    businessName: "Company Name",
+    businessAddress: "Company Address",
+    businessPhone: "Phone Number",
     clientInfoTitle: "Client Information",
     clientName: "Client Name",
     clientEmail: "Client Email",
@@ -500,6 +769,34 @@ const TRANSLATIONS = {
     alertClientNameRequired: "Please enter the client's name before generating an estimate.",
     confirmReset: "Are you sure you want to reset the form? All entered data will be lost.",
     confirmTradeSwitch: "Switch trade and load its sample line items? Your current rows will be replaced.",
+    whyTitle: "Why Incubill",
+    whyAgenticTitle: "Agentic AI & Hyper-Personalization",
+    whyAgenticDesc: "Every estimate adapts itself to your trade, your client's currency, and their language automatically — no manual setup, every time.",
+    whyConvTitle: "Conversational Marketing",
+    whyConvDesc: "Send estimates straight into WhatsApp or email as a real conversation with your client — not a cold PDF attachment nobody opens.",
+    whyVideoTitle: "Zero-Click Video Search",
+    whyVideoDesc: "Show up where homeowners are already searching, so they find a trusted quote before they even finish typing.",
+    whyGeoTitle: "GEO (Generative Engine Optimization)",
+    whyGeoDesc: "Built to be understood and recommended by AI tools like ChatGPT and Google AI Overviews — not just traditional search.",
+    whyAeoTitle: "AEO (Answer Engine Optimization)",
+    whyAeoDesc: "Structured so voice assistants and answer engines can surface Incubill the moment someone asks \"how do I quote a plumbing job.\"",
+    whyAioTitle: "AIO (Artificial Intelligence Optimization)",
+    whyAioDesc: "Every part of the tool — currency, language, trade, sharing — is tuned by AI to fit the person using it, automatically.",
+    aboutTitle: "About Incubill",
+    aboutP1: "Incubill is a PDF estimate generator built for tradespeople — plumbers, electricians, HVAC technicians, landscapers, handymen, cleaners, and general contractors — who need to send a client a professional, itemized quote in minutes instead of an hour.",
+    aboutP2: "Subscriptions are billed and processed by Dodo Payments, acting as Merchant of Record, with a 7-day free trial on every plan. Your payment details are handled entirely by Dodo's checkout — this page never sees or stores card information directly.",
+    aboutP3: "The tool runs entirely in your browser: your client's name, address, and job details are never sent to or stored on an external server, aside from the one-time location lookup used to guess a starting currency (which you can always override).",
+    faqTitle: "Frequently Asked Questions",
+    faqQ1: "Is Incubill free to use?",
+    faqA1: "Yes, for the first 7 days. Every subscription includes a free trial with full access, billed afterward through Dodo Payments unless you cancel first.",
+    faqQ2: "Which trades does Incubill support?",
+    faqA2: "Plumbing, electrical, HVAC, landscaping, handyman work, cleaning services, and general contracting are built in, each with its own sample line items. The estimate math and PDF layout work identically for any trade.",
+    faqQ3: "Does Incubill work in currencies other than US dollars?",
+    faqA3: "Yes. Incubill detects the visitor's local currency automatically and lets anyone switch to a different one manually, including USD, EUR, GBP, INR, AUD, CAD, JPY, AED, ZAR, and SGD.",
+    faqQ4: "Can I send the estimate directly to a client?",
+    faqA4: "Yes. After generating the PDF, you can share it straight to WhatsApp, email, or your device's native share sheet, in addition to downloading it.",
+    faqQ5: "Do I need to install anything to use Incubill?",
+    faqA5: "No. Incubill runs entirely in your web browser — there's nothing to download or install to create and send an estimate.",
     pdf: {
       title: "PROFESSIONAL ESTIMATE",
       companyPlaceholder: "Your Company Name | 123 Pipe Lane | (555) 123-4567",
@@ -1049,6 +1346,16 @@ function resetForm() {
   calculateTotals();
 }
 
+function getBusinessHeaderLine() {
+  const name = document.getElementById("businessName").value.trim();
+  const address = document.getElementById("businessAddress").value.trim();
+  const phone = document.getElementById("businessPhone").value.trim();
+  const parts = [name, address, phone].filter(Boolean);
+  // If the plumber hasn't filled in their real details yet, fall back to
+  // the translated placeholder so the PDF still looks complete.
+  return parts.length ? parts.join(" | ") : tPdf("companyPlaceholder");
+}
+
 function buildEstimatePDF() {
   const clientName = document.getElementById("clientName").value.trim();
   if (!clientName) {
@@ -1121,7 +1428,7 @@ function buildEstimatePDF() {
   // Company placeholder, top right
   doc.setFontSize(9);
   doc.setFont(undefined, "normal");
-  doc.text(tPdf("companyPlaceholder"), 194, 16, { align: "right" });
+  doc.text(getBusinessHeaderLine(), 194, 16, { align: "right" });
 
   // Client details
   doc.setFontSize(11);
