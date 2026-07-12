@@ -362,6 +362,11 @@
         <tbody id="jobTableBody"></tbody>
       </table>
     </div>
+    <!-- Populated dynamically per trade in JS — powers the autocomplete
+         pick-list on each row's Description field (common tools/materials
+         for the currently selected trade). -->
+    <datalist id="itemSuggestions"></datalist>
+    <p class="text-muted" style="font-size:.8rem;" data-i18n="itemSuggestHint">Tip: start typing in Description for common items for your trade, with suggested pricing.</p>
     <button class="btn btn-outline-primary btn-sm" onclick="addRow()">
       <i class="fa-solid fa-plus me-1"></i><span data-i18n="addRow">Add Row</span>
     </button>
@@ -778,6 +783,7 @@ const TRANSLATIONS = {
     unitPriceHeader: "Unit Price ({symbol})",
     totalHeader: "Total ({symbol})",
     addRow: "Add Row",
+    itemSuggestHint: "Tip: start typing in Description for common items for your trade, with suggested pricing.",
     rowActions: "Actions",
     rowLabelPrefix: "row",
     deleteRowLabel: "Delete row",
@@ -1216,6 +1222,18 @@ const TRADES = {
       { desc: "PVC Schedule 40 Elbow (3/4 inch)", qty: 4, price: 3.50 },
       { desc: "Labor (per hour)", qty: 2, price: 75.00 },
     ],
+    commonItems: [
+      { name: "1.5-inch Copper Pipe (10ft)", price: 15.00 },
+      { name: "PVC Schedule 40 Elbow (3/4 inch)", price: 3.50 },
+      { name: "PVC Pipe (10ft)", price: 8.00 },
+      { name: "Ball Valve (1/2 inch)", price: 9.50 },
+      { name: "Water Heater Installation", price: 350.00 },
+      { name: "Faucet Replacement", price: 45.00 },
+      { name: "Drain Snaking / Unclogging", price: 90.00 },
+      { name: "Toilet Installation", price: 120.00 },
+      { name: "Pipe Fitting (assorted)", price: 5.50 },
+      { name: "Labor (per hour)", price: 75.00 },
+    ],
   },
   electrician: {
     label: "Electrician's Edition",
@@ -1224,6 +1242,18 @@ const TRADES = {
       { desc: "12-Gauge Romex Wire (per ft)", qty: 50, price: 0.85 },
       { desc: "Standard Outlet Installation", qty: 3, price: 25.00 },
       { desc: "Labor (per hour)", qty: 2, price: 85.00 },
+    ],
+    commonItems: [
+      { name: "12-Gauge Romex Wire (per ft)", price: 0.85 },
+      { name: "14-Gauge Romex Wire (per ft)", price: 0.65 },
+      { name: "Standard Outlet Installation", price: 25.00 },
+      { name: "GFCI Outlet Installation", price: 35.00 },
+      { name: "Circuit Breaker (20A)", price: 18.00 },
+      { name: "Light Fixture Installation", price: 60.00 },
+      { name: "Panel Upgrade", price: 450.00 },
+      { name: "Ceiling Fan Installation", price: 85.00 },
+      { name: "Junction Box", price: 6.00 },
+      { name: "Labor (per hour)", price: 85.00 },
     ],
   },
   hvac: {
@@ -1234,6 +1264,18 @@ const TRADES = {
       { desc: "Refrigerant Recharge (per lb)", qty: 3, price: 45.00 },
       { desc: "Labor (per hour)", qty: 2, price: 90.00 },
     ],
+    commonItems: [
+      { name: "16x25x1 Furnace Filter", price: 12.00 },
+      { name: "Refrigerant Recharge (per lb)", price: 45.00 },
+      { name: "Thermostat Installation", price: 65.00 },
+      { name: "Duct Cleaning (per vent)", price: 30.00 },
+      { name: "AC Tune-Up / Inspection", price: 110.00 },
+      { name: "Capacitor Replacement", price: 40.00 },
+      { name: "Condenser Coil Cleaning", price: 85.00 },
+      { name: "Furnace Filter (per unit)", price: 12.00 },
+      { name: "Blower Motor Replacement", price: 220.00 },
+      { name: "Labor (per hour)", price: 90.00 },
+    ],
   },
   landscaper: {
     label: "Landscaping Edition",
@@ -1242,6 +1284,18 @@ const TRADES = {
       { desc: "Hardwood Mulch (per yard)", qty: 3, price: 40.00 },
       { desc: "Lawn Mowing (per visit)", qty: 1, price: 55.00 },
       { desc: "Labor (per hour)", qty: 3, price: 45.00 },
+    ],
+    commonItems: [
+      { name: "Hardwood Mulch (per yard)", price: 40.00 },
+      { name: "Lawn Mowing (per visit)", price: 55.00 },
+      { name: "Tree Trimming (per tree)", price: 75.00 },
+      { name: "Tree Removal (per tree)", price: 300.00 },
+      { name: "Sod Installation (per sq ft)", price: 1.20 },
+      { name: "Irrigation System Repair", price: 95.00 },
+      { name: "Hedge Trimming (per hour)", price: 40.00 },
+      { name: "Leaf Removal (per visit)", price: 65.00 },
+      { name: "Fertilizer Application", price: 50.00 },
+      { name: "Labor (per hour)", price: 45.00 },
     ],
   },
   handyman: {
@@ -1252,6 +1306,18 @@ const TRADES = {
       { desc: "Interior Door Hardware Set", qty: 1, price: 22.00 },
       { desc: "Labor (per hour)", qty: 3, price: 55.00 },
     ],
+    commonItems: [
+      { name: "Drywall Patch Kit", price: 18.00 },
+      { name: "Interior Door Hardware Set", price: 22.00 },
+      { name: "Furniture Assembly (per item)", price: 40.00 },
+      { name: "Picture / TV Mounting", price: 45.00 },
+      { name: "Caulking (per tube)", price: 8.00 },
+      { name: "Weatherstripping (per door)", price: 15.00 },
+      { name: "Shelf Installation", price: 35.00 },
+      { name: "Minor Plumbing Fix", price: 50.00 },
+      { name: "Paint Touch-Up (per room)", price: 60.00 },
+      { name: "Labor (per hour)", price: 55.00 },
+    ],
   },
   cleaner: {
     label: "Cleaning Edition",
@@ -1261,6 +1327,18 @@ const TRADES = {
       { desc: "Window Cleaning (per pane)", qty: 8, price: 4.00 },
       { desc: "Labor (per hour)", qty: 2, price: 40.00 },
     ],
+    commonItems: [
+      { name: "Deep Clean (per room)", price: 35.00 },
+      { name: "Window Cleaning (per pane)", price: 4.00 },
+      { name: "Carpet Shampooing (per room)", price: 45.00 },
+      { name: "Kitchen Deep Clean", price: 60.00 },
+      { name: "Bathroom Deep Clean", price: 40.00 },
+      { name: "Move-Out Cleaning (flat)", price: 250.00 },
+      { name: "Oven Cleaning", price: 35.00 },
+      { name: "Cleaning Supplies (flat fee)", price: 15.00 },
+      { name: "Upholstery Cleaning (per piece)", price: 50.00 },
+      { name: "Labor (per hour)", price: 40.00 },
+    ],
   },
   general: {
     label: "Contractor's Edition",
@@ -1269,6 +1347,18 @@ const TRADES = {
       { desc: "Framing Lumber (2x4, 8ft)", qty: 10, price: 6.50 },
       { desc: "Drywall Sheet (4x8ft)", qty: 6, price: 14.00 },
       { desc: "Labor (per hour)", qty: 4, price: 65.00 },
+    ],
+    commonItems: [
+      { name: "Framing Lumber (2x4, 8ft)", price: 6.50 },
+      { name: "Drywall Sheet (4x8ft)", price: 14.00 },
+      { name: "Concrete (per bag)", price: 7.00 },
+      { name: "Roofing Shingles (per bundle)", price: 35.00 },
+      { name: "Insulation (per roll)", price: 45.00 },
+      { name: "Permit Filing Fee", price: 150.00 },
+      { name: "Dumpster Rental (flat)", price: 300.00 },
+      { name: "Site Cleanup", price: 120.00 },
+      { name: "Project Supervision (per day)", price: 200.00 },
+      { name: "Labor (per hour)", price: 65.00 },
     ],
   },
 };
@@ -1305,6 +1395,7 @@ function applyTrade(tradeKey, isInitialLoad = false) {
   }
 
   currentTrade = tradeKey;
+  refreshItemSuggestions();
   // The header stays generic ("Incubill · All-Trades Edition") on the
   // initial page load, and only switches to a trade-specific label once
   // the person actually picks one from the dropdown themselves — this
@@ -1342,7 +1433,7 @@ function addRow(desc = "", qty = 1, price = 0) {
   tr.dataset.rowId = rowCounter;
   tr.innerHTML = `
     <td class="row-index">${rowNum}</td>
-    <td><input type="text" class="form-control desc-input" value="${desc}" aria-label="${t("description")} — ${t("rowLabelPrefix")} ${rowNum}"></td>
+    <td><input type="text" class="form-control desc-input" list="itemSuggestions" value="${desc}" aria-label="${t("description")} — ${t("rowLabelPrefix")} ${rowNum}" onchange="onDescriptionPick(this)"></td>
     <td><input type="number" class="form-control qty-input" value="${qty}" min="0" step="1" onchange="calculateTotals()" oninput="calculateTotals()" aria-label="${t("quantity")} — ${t("rowLabelPrefix")} ${rowNum}"></td>
     <td><input type="number" class="form-control price-input" value="${price.toFixed ? price.toFixed(2) : price}" min="0" step="0.01" onchange="calculateTotals()" oninput="calculateTotals()" aria-label="${t("unitPriceHeader").replace(/\s*\(.*\)/, "")} — ${t("rowLabelPrefix")} ${rowNum}"></td>
     <td class="row-total fw-semibold">${formatMoney(0)}</td>
@@ -1350,6 +1441,26 @@ function addRow(desc = "", qty = 1, price = 0) {
   `;
   tbody.appendChild(tr);
   calculateTotals();
+}
+
+// When someone picks (or types an exact match of) a common item from the
+// Description autocomplete list, auto-fill a suggested unit price. They
+// can still edit it freely afterward — this is just a starting point.
+function onDescriptionPick(inputEl) {
+  const items = (TRADES[currentTrade] && TRADES[currentTrade].commonItems) || [];
+  const match = items.find(item => item.name === inputEl.value);
+  if (match) {
+    const row = inputEl.closest("tr");
+    const priceInput = row.querySelector(".price-input");
+    priceInput.value = match.price.toFixed(2);
+  }
+  calculateTotals();
+}
+
+function refreshItemSuggestions() {
+  const datalist = document.getElementById("itemSuggestions");
+  const items = (TRADES[currentTrade] && TRADES[currentTrade].commonItems) || [];
+  datalist.innerHTML = items.map(item => `<option value="${item.name}"></option>`).join("");
 }
 
 function deleteRow(btn) {
