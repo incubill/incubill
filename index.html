@@ -235,7 +235,13 @@
     <h1><i id="tradeIcon" class="fa-solid fa-toolbox me-2"></i>Incubill <span id="tradeSubtitle" class="fw-normal">· All-Trades Estimate Tool</span></h1>
     <div class="subtitle" data-i18n="headerTagline">Professional PDF estimates in minutes</div>
   </div>
-  <div>
+  <div class="d-flex flex-column align-items-end gap-2">
+    <div class="btn-group btn-group-sm" role="group" aria-label="Billing plan">
+      <input type="radio" class="btn-check" name="billingPlan" id="planMonthly" value="monthly" checked onchange="setBillingPlan('monthly')">
+      <label class="btn btn-outline-light" for="planMonthly" data-i18n="planMonthly">Monthly</label>
+      <input type="radio" class="btn-check" name="billingPlan" id="planYearly" value="yearly" onchange="setBillingPlan('yearly')">
+      <label class="btn btn-outline-light" for="planYearly"><span data-i18n="planYearlyLabel">Yearly</span> <span class="badge text-bg-warning ms-1" data-i18n="planYearlySaveBadge">Save</span></label>
+    </div>
     <a id="subscribeBtn" href="#" target="_blank" rel="noopener" class="btn btn-subscribe">
       <i class="fa-solid fa-crown me-1"></i><span data-i18n="subscribeBtn">Subscribe Now (7-Day Free Trial)</span>
     </a>
@@ -613,24 +619,35 @@
    This page uses a Dodo Payments static payment link for the
    "Subscribe Now" button:
        https://checkout.dodopayments.com/buy/{PRODUCT_ID}?quantity=1&redirect_url={YOUR_URL}
-   1. Replace PRODUCT_ID below with your real Product ID from the Dodo
-      Payments Dashboard (looks like "pdt_xxxxxxxxxxxx").
-   2. If your product is a subscription, configure the free trial length
-      directly on the product in the Dodo Payments Dashboard (Products ->
-      your product -> Trial period), since static payment links don't
-      accept a trial-days query parameter.
+   1. Create TWO products in the Dodo Payments Dashboard — one billed
+      monthly, one billed yearly — and replace the two placeholder
+      Product IDs below with your real ones (each looks like
+      "pdt_xxxxxxxxxxxx"). They must be separate products in Dodo since
+      each has its own price/billing interval.
+   2. Configure the free trial length directly on each product in the
+      Dodo Payments Dashboard (Products -> your product -> Trial period),
+      since static payment links don't accept a trial-days query
+      parameter.
    3. redirect_url tells Dodo where to send the customer after checkout;
       it defaults to this same page, which will then show a "Subscribed!"
       banner using the payment_id/status query params Dodo appends to
       the URL on return.
 --------------------------------------------------------------------- */
-const DODO_PRODUCT_ID_MONTHLY = "pdt_your_monthly_pdt_0NixvmMnNF6ocQBAHH4t5";
-   const DODO_PRODUCT_ID_YEARLY = "pdt_your_yearly_pdt_0Niznuz8H4ZBmVMPTpz3X";
+const DODO_PRODUCT_ID_MONTHLY = "pdt_0NixvmMnNF6ocQBAHH4t5";
+const DODO_PRODUCT_ID_YEARLY = "pdt_0Niznuz8H4ZBmVMPTpz3X";
 const DODO_PAYMENT_BASE = "https://checkout.dodopayments.com/buy/";
+
+let currentBillingPlan = "monthly";
+
+function setBillingPlan(plan) {
+  currentBillingPlan = plan;
+  document.getElementById("subscribeBtn").href = buildDodoPaymentLink();
+}
 
 function buildDodoPaymentLink() {
   const redirectUrl = window.location.origin + window.location.pathname;
-  return `${DODO_PAYMENT_BASE}${DODO_PRODUCT_ID}?quantity=1&redirect_url=${encodeURIComponent(redirectUrl)}`;
+  const productId = currentBillingPlan === "yearly" ? DODO_PRODUCT_ID_YEARLY : DODO_PRODUCT_ID_MONTHLY;
+  return `${DODO_PAYMENT_BASE}${productId}?quantity=1&redirect_url=${encodeURIComponent(redirectUrl)}`;
 }
 
 function checkSubscriptionReturn() {
@@ -764,6 +781,9 @@ const TRANSLATIONS = {
     headerTagline: "Professional PDF estimates in minutes",
     genericHeaderTagline: "All-Trades Estimate Tool",
     subscribeBtn: "Subscribe Now (7-Day Free Trial)",
+    planMonthly: "Monthly",
+    planYearlyLabel: "Yearly",
+    planYearlySaveBadge: "Save",
     subscribedDefault: "Thank you for subscribing! You now have full access.",
     subscribedSuccess: "🎉 Thank you for subscribing! You now have full access to Incubill.",
     subscribedFailed: "Your checkout was not completed. You can try subscribing again anytime.",
