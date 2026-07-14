@@ -7,6 +7,24 @@
 <meta name="description" content="Incubill lets plumbers, electricians, HVAC techs, landscapers, and contractors create professional PDF estimates in minutes. Auto-detects currency and language, supports 7+ trades, and shares instantly via WhatsApp or email.">
 <meta name="keywords" content="plumber estimate generator, electrician quote tool, contractor PDF estimate, free estimate maker, HVAC quote software, handyman invoice tool">
 <meta name="robots" content="index, follow">
+<!--
+  SECURITY: Content-Security-Policy
+  Restricts the page to only load scripts, styles, fonts, and the video
+  embed from the specific domains this app actually uses. This blocks a
+  large class of attacks where malicious JavaScript from an untrusted
+  domain gets loaded into the page (e.g. via a compromised ad, a rogue
+  browser extension conflict, or a future bug that injects a <script src>
+  from somewhere unexpected) — the browser will simply refuse to load
+  anything not on this list, regardless of what the page's HTML says.
+  NOTE: 'unsafe-inline' is included for script-src/style-src because this
+  file uses inline onclick="" handlers and <script> blocks throughout
+  rather than an external JS bundle. That means CSP here does NOT protect
+  against XSS via inline script injection — only against loading scripts
+  from an unapproved external domain. Removing 'unsafe-inline' would
+  require rewriting every onclick="" handler to use addEventListener()
+  instead, which is a larger refactor than adding CSP itself.
+-->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; font-src 'self' https://cdnjs.cloudflare.com; img-src 'self' data:; connect-src 'self' https://ipapi.co; frame-src https://www.youtube-nocookie.com; object-src 'none'; base-uri 'self';">
 <link rel="canonical" href="https://incubill.com/">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%231a2a4a'/%3E%3Ctext x='50' y='68' font-size='58' font-family='Arial, sans-serif' font-weight='bold' fill='%23ffb400' text-anchor='middle'%3EI%3C/text%3E%3C/svg%3E">
 
@@ -1446,6 +1464,17 @@ function generateEstimateNumber() {
   return `EST-${num}`;
 }
 
+// Escapes any text before it's inserted into innerHTML, so a description
+// (or any other dynamic value) containing quotes, angle brackets, etc.
+// can never break out of an attribute or inject a script tag. Defense in
+// depth: current call sites don't pass attacker-controlled text, but this
+// makes the whole pattern safe regardless of how the code evolves later.
+function escapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = String(str);
+  return div.innerHTML;
+}
+
 function addRow(desc = "", qty = 1, price = 0) {
   rowCounter++;
   const tbody = document.getElementById("jobTableBody");
@@ -1454,11 +1483,11 @@ function addRow(desc = "", qty = 1, price = 0) {
   tr.dataset.rowId = rowCounter;
   tr.innerHTML = `
     <td class="row-index">${rowNum}</td>
-    <td><input type="text" class="form-control desc-input" list="itemSuggestions" value="${desc}" aria-label="${t("description")} — ${t("rowLabelPrefix")} ${rowNum}" onchange="onDescriptionPick(this)"></td>
-    <td><input type="number" class="form-control qty-input" value="${qty}" min="0" step="1" onchange="calculateTotals()" oninput="calculateTotals()" aria-label="${t("quantity")} — ${t("rowLabelPrefix")} ${rowNum}"></td>
-    <td><input type="number" class="form-control price-input" value="${price.toFixed ? price.toFixed(2) : price}" min="0" step="0.01" onchange="calculateTotals()" oninput="calculateTotals()" aria-label="${t("unitPriceHeader").replace(/\s*\(.*\)/, "")} — ${t("rowLabelPrefix")} ${rowNum}"></td>
+    <td><input type="text" class="form-control desc-input" list="itemSuggestions" value="${escapeHtml(desc)}" aria-label="${escapeHtml(t("description"))} — ${escapeHtml(t("rowLabelPrefix"))} ${rowNum}" onchange="onDescriptionPick(this)"></td>
+    <td><input type="number" class="form-control qty-input" value="${Number(qty) || 0}" min="0" step="1" onchange="calculateTotals()" oninput="calculateTotals()" aria-label="${escapeHtml(t("quantity"))} — ${escapeHtml(t("rowLabelPrefix"))} ${rowNum}"></td>
+    <td><input type="number" class="form-control price-input" value="${price.toFixed ? price.toFixed(2) : Number(price) || 0}" min="0" step="0.01" onchange="calculateTotals()" oninput="calculateTotals()" aria-label="${escapeHtml(t("unitPriceHeader").replace(/\s*\(.*\)/, ""))} — ${escapeHtml(t("rowLabelPrefix"))} ${rowNum}"></td>
     <td class="row-total fw-semibold">${formatMoney(0)}</td>
-    <td><button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteRow(this)" aria-label="${t("deleteRowLabel")} ${rowNum}"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></td>
+    <td><button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteRow(this)" aria-label="${escapeHtml(t("deleteRowLabel"))} ${rowNum}"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></td>
   `;
   tbody.appendChild(tr);
   calculateTotals();
@@ -1481,7 +1510,7 @@ function onDescriptionPick(inputEl) {
 function refreshItemSuggestions() {
   const datalist = document.getElementById("itemSuggestions");
   const items = (TRADES[currentTrade] && TRADES[currentTrade].commonItems) || [];
-  datalist.innerHTML = items.map(item => `<option value="${item.name}"></option>`).join("");
+  datalist.innerHTML = items.map(item => `<option value="${escapeHtml(item.name)}"></option>`).join("");
 }
 
 function deleteRow(btn) {
