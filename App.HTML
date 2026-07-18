@@ -339,6 +339,10 @@
         <label class="form-label" for="businessPhone" data-i18n="businessPhone">Phone Number</label>
         <input type="text" id="businessPhone" class="form-control" placeholder="(555) 123-4567">
       </div>
+      <div class="col-md-4">
+        <label class="form-label" for="businessGstin" data-i18n="businessGstin">GSTIN / Tax ID (optional)</label>
+        <input type="text" id="businessGstin" class="form-control" placeholder="27AAAAA0000A1Z5">
+      </div>
     </div>
   </div>
 
@@ -442,6 +446,63 @@
       <div class="grand-total-box h-100 d-flex flex-column justify-content-center text-center">
         <div class="mb-1" style="color:#3d4854;" data-i18n="grandTotalLabel">Grand Total</div>
         <div class="amount" id="grandTotal">$0.00</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TERMS & CONDITIONS -->
+  <div class="card-section">
+    <h2><i class="fa-solid fa-file-contract me-2"></i><span data-i18n="termsSectionTitle">Terms &amp; Conditions</span></h2>
+    <p style="font-size:.85rem;color:#495057;" data-i18n="termsSectionNote">Printed on page 2 of every PDF estimate, right after the itemized total. Fill it in once — it's remembered for this session.</p>
+
+    <div class="row g-3 mb-3">
+      <div class="col-md-4">
+        <label class="form-label" for="validityDays" data-i18n="validityLabel">Quotation Validity</label>
+        <select id="validityDays" class="form-select">
+          <option value="15" selected data-i18n="validity15">15 days</option>
+          <option value="30" data-i18n="validity30">30 days</option>
+          <option value="7" data-i18n="validity7">7 days</option>
+          <option value="45" data-i18n="validity45">45 days</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row g-3 mb-2">
+      <div class="col-12">
+        <label class="form-label mb-1" data-i18n="paymentMilestonesLabel">Payment Milestones (% of total)</label>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label small" for="advancePct" data-i18n="advanceLabel">Advance (on booking / agreement)</label>
+        <div class="input-group">
+          <input type="number" id="advancePct" class="form-control" value="40" min="0" max="100" step="1" onchange="checkMilestoneTotal()" oninput="checkMilestoneTotal()">
+          <span class="input-group-text">%</span>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label small" for="interimPct" data-i18n="interimLabel">Interim (at milestone)</label>
+        <div class="input-group">
+          <input type="number" id="interimPct" class="form-control" value="30" min="0" max="100" step="1" onchange="checkMilestoneTotal()" oninput="checkMilestoneTotal()">
+          <span class="input-group-text">%</span>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label small" for="finalPct" data-i18n="finalLabel">Final Balance (on completion &amp; testing)</label>
+        <div class="input-group">
+          <input type="number" id="finalPct" class="form-control" value="30" min="0" max="100" step="1" onchange="checkMilestoneTotal()" oninput="checkMilestoneTotal()">
+          <span class="input-group-text">%</span>
+        </div>
+      </div>
+    </div>
+    <p id="milestoneSumNote" class="mb-3" style="font-size:.8rem;"></p>
+
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label" for="scopeOfWork" data-i18n="scopeLabel">Scope of Work / Materials Used</label>
+        <textarea id="scopeOfWork" class="form-control" rows="3" data-i18n-placeholder="scopePlaceholder" placeholder="e.g., Finolex wires for electrical work, Astral PVC pipes for plumbing"></textarea>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label" for="exclusions" data-i18n="exclusionsLabel">Exclusions</label>
+        <textarea id="exclusions" class="form-control" rows="3" data-i18n-placeholder="exclusionsPlaceholder" placeholder="e.g., Fixing of light fixtures not included; painting/patchwork after wall chasing excluded"></textarea>
       </div>
     </div>
   </div>
@@ -792,6 +853,23 @@ const TRANSLATIONS = {
     businessName: "Company Name",
     businessAddress: "Company Address",
     businessPhone: "Phone Number",
+    businessGstin: "GSTIN / Tax ID (optional)",
+    termsSectionTitle: "Terms & Conditions",
+    termsSectionNote: "Printed on page 2 of every PDF estimate, right after the itemized total. Fill it in once — it's remembered for this session.",
+    validityLabel: "Quotation Validity",
+    validity7: "7 days",
+    validity15: "15 days",
+    validity30: "30 days",
+    validity45: "45 days",
+    paymentMilestonesLabel: "Payment Milestones (% of total)",
+    advanceLabel: "Advance (on booking / agreement)",
+    interimLabel: "Interim (at milestone)",
+    finalLabel: "Final Balance (on completion & testing)",
+    milestoneSumWarning: "Milestones should total 100%",
+    scopeLabel: "Scope of Work / Materials Used",
+    scopePlaceholder: "e.g., Finolex wires for electrical work, Astral PVC pipes for plumbing",
+    exclusionsLabel: "Exclusions",
+    exclusionsPlaceholder: "e.g., Fixing of light fixtures not included; painting/patchwork after wall chasing excluded",
     clientInfoTitle: "Client Information",
     clientName: "Client Name",
     clientEmail: "Client Email",
@@ -865,6 +943,20 @@ const TRANSLATIONS = {
       subtotal: "Subtotal:", travelFee: "Travel Fee:", tax: "Tax", grandTotal: "Grand Total:",
       terms: "Terms: Payment due upon receipt. Please make checks payable to [Your Company].",
       footer: "Thank you for your business!",
+      gstinPrefix: "GSTIN:",
+      termsHeading: "TERMS & CONDITIONS",
+      validityHeading: "Validity Period",
+      validityText: "This quotation is valid for {days} days from the date of issue. Prices and material availability are not guaranteed beyond this period.",
+      paymentMilestonesHeading: "Payment Milestones",
+      advance: "Advance — due on booking / agreement signing:",
+      interim: "Interim — due at agreed milestone:",
+      finalBalance: "Final Balance — due on completion & testing:",
+      scopeHeading: "Scope of Work / Materials",
+      scopeDefault: "Materials, brands, and exact quantities to be used will be confirmed in writing before work begins. Any change in scope will be quoted separately.",
+      exclusionsHeading: "Exclusions",
+      exclusionsDefault: "This quotation excludes any work, fixtures, or materials not explicitly listed above. Additional repairs found during the job will be quoted separately before proceeding.",
+      contractorSignature: "Contractor Signature",
+      clientSignature: "Client Signature",
     },
   },
   es: {
@@ -911,6 +1003,20 @@ const TRANSLATIONS = {
       subtotal: "Subtotal:", travelFee: "Cargo de Viaje:", tax: "Impuesto", grandTotal: "Total General:",
       terms: "Términos: Pago a la entrega. Cheques a nombre de [Tu Empresa].",
       footer: "¡Gracias por su preferencia!",
+      gstinPrefix: "NIF/GSTIN:",
+      termsHeading: "TÉRMINOS Y CONDICIONES",
+      validityHeading: "Período de Validez",
+      validityText: "Este presupuesto es válido durante {days} días desde la fecha de emisión. Los precios y la disponibilidad de materiales no se garantizan después de este período.",
+      paymentMilestonesHeading: "Hitos de Pago",
+      advance: "Anticipo — al reservar / firmar el acuerdo:",
+      interim: "Pago intermedio — al alcanzar el hito acordado:",
+      finalBalance: "Saldo final — al finalizar y probar el trabajo:",
+      scopeHeading: "Alcance del Trabajo / Materiales",
+      scopeDefault: "Los materiales, marcas y cantidades exactas se confirmarán por escrito antes de iniciar el trabajo. Cualquier cambio de alcance se cotizará por separado.",
+      exclusionsHeading: "Exclusiones",
+      exclusionsDefault: "Este presupuesto excluye cualquier trabajo, accesorio o material no listado explícitamente arriba. Las reparaciones adicionales encontradas durante el trabajo se cotizarán por separado antes de proceder.",
+      contractorSignature: "Firma del Contratista",
+      clientSignature: "Firma del Cliente",
     },
   },
   fr: {
@@ -957,6 +1063,20 @@ const TRANSLATIONS = {
       subtotal: "Sous-total :", travelFee: "Frais de Déplacement :", tax: "Taxe", grandTotal: "Total Général :",
       terms: "Conditions : Paiement à réception. Chèques à l'ordre de [Votre Entreprise].",
       footer: "Merci de votre confiance !",
+      gstinPrefix: "N° TVA :",
+      termsHeading: "TERMES ET CONDITIONS",
+      validityHeading: "Période de Validité",
+      validityText: "Ce devis est valable {days} jours à compter de la date d'émission. Les prix et la disponibilité des matériaux ne sont pas garantis au-delà de cette période.",
+      paymentMilestonesHeading: "Échéances de Paiement",
+      advance: "Acompte — à la réservation / signature de l'accord :",
+      interim: "Paiement intermédiaire — à l'étape convenue :",
+      finalBalance: "Solde final — à l'achèvement et aux essais :",
+      scopeHeading: "Périmètre des Travaux / Matériaux",
+      scopeDefault: "Les matériaux, marques et quantités exactes seront confirmés par écrit avant le début des travaux. Tout changement de périmètre fera l'objet d'un devis séparé.",
+      exclusionsHeading: "Exclusions",
+      exclusionsDefault: "Ce devis exclut tout travail, accessoire ou matériau non explicitement listé ci-dessus. Les réparations supplémentaires constatées en cours de chantier feront l'objet d'un devis séparé avant exécution.",
+      contractorSignature: "Signature de l'Entrepreneur",
+      clientSignature: "Signature du Client",
     },
   },
   de: {
@@ -1003,6 +1123,20 @@ const TRANSLATIONS = {
       subtotal: "Zwischensumme:", travelFee: "Anfahrtspauschale:", tax: "Steuer", grandTotal: "Gesamtsumme:",
       terms: "Bedingungen: Zahlung bei Erhalt fällig. Schecks an [Ihre Firma].",
       footer: "Vielen Dank für Ihr Vertrauen!",
+      gstinPrefix: "USt-IdNr.:",
+      termsHeading: "GESCHÄFTSBEDINGUNGEN",
+      validityHeading: "Gültigkeitszeitraum",
+      validityText: "Dieses Angebot ist {days} Tage ab Ausstellungsdatum gültig. Preise und Materialverfügbarkeit werden nach diesem Zeitraum nicht garantiert.",
+      paymentMilestonesHeading: "Zahlungsmeilensteine",
+      advance: "Anzahlung — fällig bei Buchung / Vertragsunterzeichnung:",
+      interim: "Zwischenzahlung — fällig bei vereinbartem Meilenstein:",
+      finalBalance: "Restzahlung — fällig bei Fertigstellung & Abnahme:",
+      scopeHeading: "Leistungsumfang / Materialien",
+      scopeDefault: "Materialien, Marken und genaue Mengen werden vor Arbeitsbeginn schriftlich bestätigt. Jede Änderung des Leistungsumfangs wird separat angeboten.",
+      exclusionsHeading: "Ausschlüsse",
+      exclusionsDefault: "Dieses Angebot schließt jegliche Arbeiten, Armaturen oder Materialien aus, die oben nicht ausdrücklich aufgeführt sind. Während der Arbeit festgestellte zusätzliche Reparaturen werden vor Fortsetzung separat angeboten.",
+      contractorSignature: "Unterschrift Auftragnehmer",
+      clientSignature: "Unterschrift Kunde",
     },
   },
   pt: {
@@ -1049,6 +1183,20 @@ const TRANSLATIONS = {
       subtotal: "Subtotal:", travelFee: "Taxa de Deslocamento:", tax: "Imposto", grandTotal: "Total Geral:",
       terms: "Termos: Pagamento devido no recebimento. Cheques em nome de [Sua Empresa].",
       footer: "Obrigado pela preferência!",
+      gstinPrefix: "NIF/GSTIN:",
+      termsHeading: "TERMOS E CONDIÇÕES",
+      validityHeading: "Período de Validade",
+      validityText: "Este orçamento é válido por {days} dias a partir da data de emissão. Preços e disponibilidade de materiais não são garantidos após este período.",
+      paymentMilestonesHeading: "Marcos de Pagamento",
+      advance: "Adiantamento — devido na reserva / assinatura do acordo:",
+      interim: "Pagamento intermediário — devido no marco acordado:",
+      finalBalance: "Saldo final — devido na conclusão e teste:",
+      scopeHeading: "Escopo do Trabalho / Materiais",
+      scopeDefault: "Materiais, marcas e quantidades exatas serão confirmados por escrito antes do início do trabalho. Qualquer alteração no escopo será orçada separadamente.",
+      exclusionsHeading: "Exclusões",
+      exclusionsDefault: "Este orçamento exclui qualquer trabalho, acessório ou material não listado explicitamente acima. Reparos adicionais encontrados durante o trabalho serão orçados separadamente antes de prosseguir.",
+      contractorSignature: "Assinatura do Contratante",
+      clientSignature: "Assinatura do Cliente",
     },
   },
   it: {
@@ -1095,6 +1243,20 @@ const TRANSLATIONS = {
       subtotal: "Subtotale:", travelFee: "Costo di Trasferta:", tax: "Imposta", grandTotal: "Totale Generale:",
       terms: "Termini: Pagamento dovuto alla ricezione. Assegni intestati a [La Tua Azienda].",
       footer: "Grazie per la fiducia!",
+      gstinPrefix: "P.IVA:",
+      termsHeading: "TERMINI E CONDIZIONI",
+      validityHeading: "Periodo di Validità",
+      validityText: "Questo preventivo è valido per {days} giorni dalla data di emissione. Prezzi e disponibilità dei materiali non sono garantiti oltre questo periodo.",
+      paymentMilestonesHeading: "Scadenze di Pagamento",
+      advance: "Acconto — dovuto alla prenotazione / firma dell'accordo:",
+      interim: "Pagamento intermedio — dovuto al raggiungimento della fase concordata:",
+      finalBalance: "Saldo finale — dovuto al completamento e collaudo:",
+      scopeHeading: "Ambito del Lavoro / Materiali",
+      scopeDefault: "Materiali, marche e quantità esatte saranno confermati per iscritto prima dell'inizio dei lavori. Qualsiasi modifica all'ambito sarà preventivata separatamente.",
+      exclusionsHeading: "Esclusioni",
+      exclusionsDefault: "Questo preventivo esclude qualsiasi lavoro, accessorio o materiale non esplicitamente elencato sopra. Eventuali riparazioni aggiuntive riscontrate durante il lavoro saranno preventivate separatamente prima di procedere.",
+      contractorSignature: "Firma dell'Appaltatore",
+      clientSignature: "Firma del Cliente",
     },
   },
   hi: {
@@ -1194,6 +1356,12 @@ function applyLanguage() {
     const key = el.getAttribute("data-i18n");
     const val = t(key);
     if (val !== undefined) el.textContent = val;
+  });
+
+  document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+    const key = el.getAttribute("data-i18n-placeholder");
+    const val = t(key);
+    if (val !== undefined) el.setAttribute("placeholder", val);
   });
 
   // RTL support for Arabic
@@ -1547,10 +1715,28 @@ function getBusinessHeaderLine() {
   const name = document.getElementById("businessName").value.trim();
   const address = document.getElementById("businessAddress").value.trim();
   const phone = document.getElementById("businessPhone").value.trim();
+  const gstin = document.getElementById("businessGstin").value.trim();
   const parts = [name, address, phone].filter(Boolean);
+  if (gstin) parts.push(`${tPdf("gstinPrefix")} ${gstin}`);
   // If the plumber hasn't filled in their real details yet, fall back to
   // the translated placeholder so the PDF still looks complete.
   return parts.length ? parts.join(" | ") : tPdf("companyPlaceholder");
+}
+
+// Live validation note under the payment-milestone % inputs — purely a
+// UI nicety, doesn't block PDF generation if it doesn't add to 100.
+function checkMilestoneTotal() {
+  const advance = parseFloat(document.getElementById("advancePct").value) || 0;
+  const interim = parseFloat(document.getElementById("interimPct").value) || 0;
+  const final = parseFloat(document.getElementById("finalPct").value) || 0;
+  const sum = advance + interim + final;
+  const note = document.getElementById("milestoneSumNote");
+  if (sum === 100) {
+    note.textContent = "";
+  } else {
+    note.style.color = "#c0392b";
+    note.textContent = `${t("milestoneSumWarning")} (${sum}%)`;
+  }
 }
 
 function buildEstimatePDF() {
@@ -1695,6 +1881,98 @@ function buildEstimatePDF() {
   doc.setFont(undefined, "normal");
   doc.setFontSize(10);
   doc.text(tPdf("footer"), 105, 282, { align: "center" });
+
+  // -------------------------------------------------------------------
+  // PAGE 2 — Terms & Conditions (validity, payment milestones, scope of
+  // work / materials, exclusions). Kept on its own page so page 1 stays
+  // a clean itemized total, and so this section never gets squeezed or
+  // overlapped by a long item list.
+  // -------------------------------------------------------------------
+  const validityDaysVal = document.getElementById("validityDays").value;
+  const advancePctVal = parseFloat(document.getElementById("advancePct").value) || 0;
+  const interimPctVal = parseFloat(document.getElementById("interimPct").value) || 0;
+  const finalPctVal = parseFloat(document.getElementById("finalPct").value) || 0;
+  const scopeText = document.getElementById("scopeOfWork").value.trim();
+  const exclusionsText = document.getElementById("exclusions").value.trim();
+
+  doc.addPage();
+  doc.setDrawColor(26, 42, 74);
+  doc.setLineWidth(0.5);
+  doc.rect(8, 8, 194, 281);
+
+  const contentWidth = 172; // 194 - 14 (left margin) - 8 (right margin)
+  let ty = 24;
+
+  doc.setFont(undefined, "bold");
+  doc.setFontSize(16);
+  doc.text(tPdf("termsHeading"), 105, ty, { align: "center" });
+  ty += 6;
+  doc.setFont(undefined, "normal");
+  doc.setFontSize(9);
+  doc.text(`${estimateNumber} — ${clientName}`, 105, ty, { align: "center" });
+  ty += 14;
+
+  // Validity
+  doc.setFont(undefined, "bold");
+  doc.setFontSize(11);
+  doc.text(tPdf("validityHeading"), 14, ty);
+  ty += 6;
+  doc.setFont(undefined, "normal");
+  doc.setFontSize(10);
+  const validityLine = tPdf("validityText").replace("{days}", validityDaysVal);
+  doc.text(doc.splitTextToSize(validityLine, contentWidth), 14, ty);
+  ty += 14;
+
+  // Payment milestones
+  doc.setFont(undefined, "bold");
+  doc.setFontSize(11);
+  doc.text(tPdf("paymentMilestonesHeading"), 14, ty);
+  ty += 7;
+  doc.setFont(undefined, "normal");
+  doc.setFontSize(10);
+  const milestoneRows = [
+    [tPdf("advance"), `${advancePctVal}%`],
+    [tPdf("interim"), `${interimPctVal}%`],
+    [tPdf("finalBalance"), `${finalPctVal}%`],
+  ];
+  milestoneRows.forEach(([label, pct]) => {
+    doc.text(`•  ${label}`, 18, ty);
+    doc.text(pct, 186, ty, { align: "right" });
+    ty += 6;
+  });
+  ty += 8;
+
+  // Scope of work / materials
+  doc.setFont(undefined, "bold");
+  doc.setFontSize(11);
+  doc.text(tPdf("scopeHeading"), 14, ty);
+  ty += 6;
+  doc.setFont(undefined, "normal");
+  doc.setFontSize(10);
+  const scopeLines = doc.splitTextToSize(scopeText || tPdf("scopeDefault"), contentWidth);
+  doc.text(scopeLines, 14, ty);
+  ty += scopeLines.length * 5 + 10;
+
+  // Exclusions
+  doc.setFont(undefined, "bold");
+  doc.setFontSize(11);
+  doc.text(tPdf("exclusionsHeading"), 14, ty);
+  ty += 6;
+  doc.setFont(undefined, "normal");
+  doc.setFontSize(10);
+  const exclusionsLines = doc.splitTextToSize(exclusionsText || tPdf("exclusionsDefault"), contentWidth);
+  doc.text(exclusionsLines, 14, ty);
+  ty += exclusionsLines.length * 5 + 10;
+
+  // Signature lines
+  ty = Math.max(ty, 250);
+  doc.setDrawColor(150, 150, 150);
+  doc.setLineWidth(0.2);
+  doc.line(14, ty, 90, ty);
+  doc.line(120, ty, 196, ty);
+  doc.setFontSize(9);
+  doc.text(tPdf("contractorSignature"), 14, ty + 5);
+  doc.text(tPdf("clientSignature"), 120, ty + 5);
 
   const filename = `${estimateNumber}_${clientName.replace(/\s+/g, "_")}.pdf`;
   const summaryText =
