@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Privacy Policy · Incubill{% endblock %}
+{% block content %}
+<div class="auth-card" style="max-width:720px;">
+  <h1>Privacy Policy</h1>
+  <p class="text-muted">Last updated: [DATE — fill this in]</p>
+
+  <p><strong>PLACEHOLDER CONTENT — replace before going live.</strong> This is a starting skeleton, not legal advice. If you have users in the EU/UK (GDPR) or California (CCPA), get this reviewed properly.</p>
+
+  <h2 class="h5 mt-4">What We Collect</h2>
+  <ul>
+    <li>Account info: email address, password (stored as a hash, never in plain text)</li>
+    <li>Subscription/billing status (synced from Dodo Payments — we never see or store your card details; Dodo handles that entirely)</li>
+    <li>Estimate data (client name, job details) you type into the tool — this stays in your account's session and is not shared with third parties</li>
+  </ul>
+
+  <h2 class="h5 mt-4">Third Parties</h2>
+  <p>Dodo Payments processes all payments as Merchant of Record. See their privacy policy at dodopayments.com. A one-time IP-based location lookup (ipapi.co) is used to guess your currency when you open the tool.</p>
+
+  <h2 class="h5 mt-4">Your Rights</h2>
+  <p>[Add data deletion/export process here — required under GDPR/CCPA if applicable to your users.]</p>
+
+  <h2 class="h5 mt-4">Contact</h2>
+  <p>Questions about this policy: [your support email]</p>
+
+  <p class="mt-4"><a href="{{ url_for('login') }}">&larr; Back</a></p>
+</div>
+{% endblock %}

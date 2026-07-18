@@ -1,0 +1,2056 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Incubill – Free PDF Estimate Generator for Plumbers, Electricians & Contractors</title>
+<meta name="description" content="Incubill lets plumbers, electricians, HVAC techs, landscapers, and contractors create professional PDF estimates in minutes. Auto-detects currency and language, supports 7+ trades, and shares instantly via WhatsApp or email.">
+<meta name="keywords" content="plumber estimate generator, electrician quote tool, contractor PDF estimate, free estimate maker, HVAC quote software, handyman invoice tool">
+<meta name="robots" content="index, follow">
+<!--
+  SECURITY: Content-Security-Policy
+  Restricts the page to only load scripts, styles, fonts, and the video
+  embed from the specific domains this app actually uses. This blocks a
+  large class of attacks where malicious JavaScript from an untrusted
+  domain gets loaded into the page (e.g. via a compromised ad, a rogue
+  browser extension conflict, or a future bug that injects a <script src>
+  from somewhere unexpected) — the browser will simply refuse to load
+  anything not on this list, regardless of what the page's HTML says.
+  NOTE: 'unsafe-inline' is included for script-src/style-src because this
+  file uses inline onclick="" handlers and <script> blocks throughout
+  rather than an external JS bundle. That means CSP here does NOT protect
+  against XSS via inline script injection — only against loading scripts
+  from an unapproved external domain. Removing 'unsafe-inline' would
+  require rewriting every onclick="" handler to use addEventListener()
+  instead, which is a larger refactor than adding CSP itself.
+-->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; font-src 'self' https://cdnjs.cloudflare.com; img-src 'self' data:; connect-src 'self' https://ipapi.co; frame-src https://www.youtube-nocookie.com; object-src 'none'; base-uri 'self';">
+<link rel="canonical" href="https://incubill.com/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%231a2a4a'/%3E%3Ctext x='50' y='68' font-size='58' font-family='Arial, sans-serif' font-weight='bold' fill='%23ffb400' text-anchor='middle'%3EI%3C/text%3E%3C/svg%3E">
+
+<!-- Open Graph / social preview -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Incubill – Free PDF Estimate Generator for Tradespeople">
+<meta property="og:description" content="Create professional PDF estimates for plumbing, electrical, HVAC, landscaping, and handyman jobs in minutes — with auto currency and language detection.">
+<meta property="og:url" content="https://incubill.com/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Incubill – Free PDF Estimate Generator for Tradespeople">
+<meta name="twitter:description" content="Create professional PDF estimates for plumbing, electrical, HVAC, landscaping, and handyman jobs in minutes.">
+
+<!--
+  ================================================================
+  GEO / AEO / AIO / E-E-A-T NOTES FOR THE DEVELOPER
+  ================================================================
+  This page is structured so AI answer engines (ChatGPT, Google AI
+  Overviews, Perplexity) and traditional search engines can both find
+  and accurately cite it, without ongoing manual SEO work:
+
+  - GEO (Generative Engine Optimization): the JSON-LD SoftwareApplication
+    block below gives generative engines a clean, structured fact-sheet
+    about what this tool is, who it's for, and what it costs — the
+    kind of structured data these engines prefer over freeform prose.
+  - AEO (Answer Engine Optimization): the visible FAQ section further
+    down the page, paired with the matching FAQPage JSON-LD block,
+    is written as direct question-answer pairs so answer engines and
+    voice assistants can lift a complete, accurate answer verbatim.
+  - AIO (Artificial Intelligence Optimization): semantic HTML (proper
+    heading hierarchy, descriptive labels, structured data) makes the
+    whole page easier for any AI system to parse and represent
+    correctly — not just the FAQ section.
+  - E-E-A-T (Experience, Expertise, Authoritativeness, Trust): the
+    "About Incubill" trust section further down states plainly who
+    built the tool, how pricing/billing works, and how payments are
+    processed (Dodo Payments, a real Merchant of Record) — the kind
+    of concrete, checkable specifics that both search engines and
+    human readers use to judge trustworthiness.
+
+  IMPORTANT: update the canonical URL, og:url, and the JSON-LD "url"
+  field above/below if you ever move this off incubill.com.
+-->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Incubill",
+  "url": "https://incubill.com/",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Any (Web-based)",
+  "description": "Incubill is a web-based tool that lets plumbers, electricians, HVAC technicians, landscapers, handymen, cleaners, and general contractors create professional, itemized PDF estimates in minutes. It auto-detects the visitor's local currency and language, supports multiple trades with trade-specific sample line items, and lets estimates be shared instantly via WhatsApp, email, or the device's native share sheet.",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD",
+    "description": "7-day free trial, then a paid monthly subscription processed by Dodo Payments."
+  },
+  "featureList": [
+    "Itemized PDF estimate generation",
+    "Support for plumbing, electrical, HVAC, landscaping, handyman, cleaning, and general contracting trades",
+    "Automatic currency detection by location with manual override",
+    "Automatic language detection by browser with manual override, including English, Spanish, French, German, Portuguese, Italian, Hindi, and Arabic",
+    "Direct sharing via WhatsApp, email, and native device share sheet",
+    "Editable travel fee and tax rate calculation"
+  ]
+}
+</script>
+
+<!-- Bootstrap 5 -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+<style>
+  :root {
+    --navy: #1a2a4a;
+    --green: #1a7a3d;
+  }
+  body {
+    background: #f4f6f9;
+  }
+  .app-header {
+    background: var(--navy);
+    color: #fff;
+    padding: 18px 24px;
+  }
+  .app-header h1 {
+    font-size: 1.4rem;
+    margin: 0;
+    font-weight: 700;
+  }
+  .app-header .subtitle {
+    font-size: .85rem;
+    opacity: .8;
+  }
+  .card-section {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,.07);
+    padding: 28px;
+    margin-bottom: 24px;
+  }
+  .card-section h2 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 18px;
+    border-bottom: 2px solid #eef0f4;
+    padding-bottom: 10px;
+  }
+  table.job-table input {
+    min-width: 90px;
+  }
+  table.job-table td, table.job-table th {
+    vertical-align: middle;
+  }
+  .grand-total-box {
+    background: #e9f7ee;
+    border: 1px solid #bfe6cc;
+    border-radius: 10px;
+    padding: 20px;
+  }
+  .grand-total-box .amount {
+    font-size: 1.9rem;
+    font-weight: 800;
+    color: var(--green);
+  }
+  .btn-subscribe {
+    background: #ffb400;
+    color: #1a2a4a;
+    font-weight: 700;
+    border: none;
+  }
+  .btn-subscribe:hover {
+    background: #ffc233;
+    color: #1a2a4a;
+  }
+  .subscribed-banner {
+    background: #e9f7ee;
+    border: 1px solid #bfe6cc;
+    color: var(--green);
+    border-radius: 8px;
+    padding: 12px 18px;
+    margin-bottom: 20px;
+    font-weight: 600;
+  }
+  .trade-picker-wrap {
+    background: #fff;
+    border-bottom: 1px solid #e4e7ee;
+    padding: 10px 24px;
+  }
+  .trade-picker-wrap label {
+    font-size: .8rem;
+    color: #6b7280;
+    font-weight: 600;
+    margin-right: 8px;
+    white-space: nowrap;
+  }
+  #tradeSelect {
+    max-width: 260px;
+    display: inline-block;
+    width: auto;
+  }
+  .why-card {
+    height: 100%;
+    padding: 20px;
+    border: 1px solid #eef0f4;
+    border-radius: 10px;
+    background: #fbfcfe;
+  }
+  .why-icon {
+    font-size: 1.4rem;
+    color: var(--navy);
+    background: #eef2fa;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+  }
+  .why-card h3 {
+    font-size: 0.98rem;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 6px;
+  }
+  .why-card p {
+    font-size: 0.87rem;
+    color: #5b6472;
+    margin-bottom: 0;
+  }
+  .faq-item {
+    padding: 14px 0;
+    border-bottom: 1px solid #eef0f4;
+  }
+  .faq-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+  .faq-item h3 {
+    font-size: 0.98rem;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 6px;
+  }
+  .faq-item p {
+    font-size: 0.9rem;
+    color: #5b6472;
+    margin-bottom: 0;
+  }
+  @media (max-width: 576px) {
+    .app-header h1 { font-size: 1.15rem; }
+    .card-section { padding: 18px; }
+    .trade-picker-wrap { padding: 10px 16px; }
+    #tradeSelect { max-width: 100%; width: 100%; margin-top: 6px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="app-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <div>
+    <h1><i id="tradeIcon" class="fa-solid fa-toolbox me-2"></i>Incubill <span id="tradeSubtitle" class="fw-normal">· All-Trades Estimate Tool</span></h1>
+    <div class="subtitle" data-i18n="headerTagline">Professional PDF estimates in minutes</div>
+  </div>
+  <div class="d-flex align-items-center gap-3">
+    <div class="text-end">
+      <div style="font-size:.85rem;">{{ user.email }}</div>
+      <div style="font-size:.75rem;" class="text-white-50">
+        {% if user.subscription_status == 'trialing' %}
+          <span class="badge text-bg-warning">Free Trial</span>
+        {% elif user.subscription_status == 'active' %}
+          <span class="badge text-bg-success">{{ user.plan|default('Active', true)|capitalize }} Plan</span>
+        {% else %}
+          <span class="badge text-bg-secondary">{{ user.subscription_status|capitalize }}</span>
+        {% endif %}
+      </div>
+    </div>
+    <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm">
+      <i class="fa-solid fa-right-from-bracket me-1"></i>Log Out
+    </a>
+  </div>
+</header>
+
+<!-- TRADE + CURRENCY PICKER -->
+<div class="trade-picker-wrap d-flex flex-wrap align-items-center gap-3">
+  <div>
+    <label for="tradeSelect"><i class="fa-solid fa-toolbox me-1"></i>I'm a:</label>
+    <select id="tradeSelect" class="form-select form-select-sm" onchange="applyTrade(this.value)">
+      <option value="plumber">Plumber</option>
+      <option value="electrician">Electrician</option>
+      <option value="hvac">HVAC Technician</option>
+      <option value="landscaper">Landscaper</option>
+      <option value="handyman">Handyman</option>
+      <option value="cleaner">Cleaning Service</option>
+      <option value="general">General Contractor</option>
+    </select>
+  </div>
+  <div>
+    <label for="currencySelect"><i class="fa-solid fa-coins me-1"></i>Currency:</label>
+    <select id="currencySelect" class="form-select form-select-sm" onchange="setCurrency(this.value, true)">
+      <option value="auto">Auto-detect (by location)</option>
+      <option value="USD">USD – US Dollar ($)</option>
+      <option value="EUR">EUR – Euro (€)</option>
+      <option value="GBP">GBP – British Pound (£)</option>
+      <option value="INR">INR – Indian Rupee (₹)</option>
+      <option value="AUD">AUD – Australian Dollar (A$)</option>
+      <option value="CAD">CAD – Canadian Dollar (C$)</option>
+      <option value="JPY">JPY – Japanese Yen (¥)</option>
+      <option value="AED">AED – UAE Dirham (د.إ)</option>
+      <option value="ZAR">ZAR – South African Rand (R)</option>
+      <option value="SGD">SGD – Singapore Dollar (S$)</option>
+    </select>
+    <span id="currencyDetectNote" style="font-size:.75rem;color:#495057;"></span>
+  </div>
+  <div>
+    <label for="languageSelect"><i class="fa-solid fa-globe me-1"></i>Language:</label>
+    <select id="languageSelect" class="form-select form-select-sm" onchange="setLanguage(this.value, true)">
+      <option value="auto">Auto-detect (by browser)</option>
+      <option value="en">English</option>
+      <option value="es">Español (Spanish)</option>
+      <option value="fr">Français (French)</option>
+      <option value="de">Deutsch (German)</option>
+      <option value="pt">Português (Portuguese)</option>
+      <option value="it">Italiano (Italian)</option>
+      <option value="hi">हिन्दी (Hindi) — screen only</option>
+      <option value="ar">العربية (Arabic) — screen only</option>
+    </select>
+    <span id="languageDetectNote" style="font-size:.75rem;color:#495057;"></span>
+  </div>
+</div>
+
+<div class="container py-4">
+
+  <!-- YOUR BUSINESS INFO -->
+  <div class="card-section">
+    <h2><i class="fa-solid fa-building me-2"></i><span data-i18n="businessInfoTitle">Your Business Details</span></h2>
+    <p style="font-size:.85rem;color:#495057;" data-i18n="businessInfoNote">This appears at the top of every PDF estimate instead of a placeholder. Fill it in once — it's remembered for this session.</p>
+    <div class="row g-3">
+      <div class="col-md-4">
+        <label class="form-label" for="businessName" data-i18n="businessName">Company Name</label>
+        <input type="text" id="businessName" class="form-control" placeholder="Your Company Name">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label" for="businessAddress" data-i18n="businessAddress">Company Address</label>
+        <input type="text" id="businessAddress" class="form-control" placeholder="123 Pipe Lane">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label" for="businessPhone" data-i18n="businessPhone">Phone Number</label>
+        <input type="text" id="businessPhone" class="form-control" placeholder="(555) 123-4567">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label" for="businessGstin" data-i18n="businessGstin">GSTIN / Tax ID (optional)</label>
+        <input type="text" id="businessGstin" class="form-control" placeholder="27AAAAA0000A1Z5">
+      </div>
+    </div>
+  </div>
+
+  <!-- CLIENT INFO -->
+  <div class="card-section">
+    <h2><i class="fa-solid fa-user me-2"></i><span data-i18n="clientInfoTitle">Client Information</span></h2>
+    <div class="row g-3">
+      <div class="col-md-4">
+        <label class="form-label" for="clientName"><span data-i18n="clientName">Client Name</span> <span class="text-danger">*</span></label>
+        <input type="text" id="clientName" class="form-control" required>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label" for="clientEmail"><span data-i18n="clientEmail">Client Email</span> <span class="text-danger">*</span></label>
+        <input type="email" id="clientEmail" class="form-control" required>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label" for="clientAddress" data-i18n="clientAddress">Client Address</label>
+        <input type="text" id="clientAddress" class="form-control">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label" for="estimateDate" data-i18n="estimateDate">Estimate Date</label>
+        <input type="date" id="estimateDate" class="form-control">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label" for="estimateNumber" data-i18n="estimateNumber">Estimate Number</label>
+        <input type="text" id="estimateNumber" class="form-control" readonly>
+      </div>
+    </div>
+  </div>
+
+  <!-- JOB DETAILS -->
+  <div class="card-section">
+    <h2><i class="fa-solid fa-list-check me-2"></i><span data-i18n="jobDetailsTitle">Job Details</span></h2>
+    <div class="table-responsive">
+      <table class="table job-table align-middle">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col" data-i18n="description">Description</th>
+            <th scope="col" style="width:100px;" data-i18n="quantity">Quantity</th>
+            <th scope="col" style="width:130px;" id="unitPriceHeader">Unit Price ($)</th>
+            <th scope="col" style="width:110px;" id="totalHeader">Total ($)</th>
+            <th scope="col" style="width:40px;"><span class="visually-hidden" data-i18n="rowActions">Actions</span></th>
+          </tr>
+        </thead>
+        <tbody id="jobTableBody"></tbody>
+      </table>
+    </div>
+    <!-- Populated dynamically per trade in JS — powers the autocomplete
+         pick-list on each row's Description field (common tools/materials
+         for the currently selected trade). -->
+    <datalist id="itemSuggestions"></datalist>
+    <p class="text-muted" style="font-size:.8rem;" data-i18n="itemSuggestHint">Tip: start typing in Description for common items for your trade, with suggested pricing.</p>
+    <button class="btn btn-outline-primary btn-sm" onclick="addRow()">
+      <i class="fa-solid fa-plus me-1"></i><span data-i18n="addRow">Add Row</span>
+    </button>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="row">
+    <div class="col-lg-7 mb-4">
+      <div class="card-section h-100">
+        <h2><i class="fa-solid fa-sliders me-2"></i><span data-i18n="summaryTitle">Summary &amp; Options</span></h2>
+
+        <div class="mb-3 d-flex align-items-center flex-wrap gap-2">
+          <div class="form-check mb-0">
+            <input type="checkbox" class="form-check-input" id="travelFee" onchange="calculateTotals()">
+            <label class="form-check-label" for="travelFee" data-i18n="travelFee">Add Travel Fee</label>
+          </div>
+          <div class="input-group input-group-sm" style="max-width:140px;">
+            <label class="visually-hidden" for="travelFeeAmount" data-i18n="travelFeeAmountLabel">Travel fee amount</label>
+            <span class="input-group-text" id="travelFeeCurrencyLabel" aria-hidden="true">$</span>
+            <input type="number" id="travelFeeAmount" class="form-control" value="30.00" min="0" step="0.01" onchange="calculateTotals()" oninput="calculateTotals()">
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="taxRate" data-i18n="taxRate">Tax Rate</label>
+          <select id="taxRate" class="form-select" onchange="calculateTotals()">
+            <option value="0">0%</option>
+            <option value="0.05">5%</option>
+            <option value="0.08" selected>8%</option>
+            <option value="0.10">10%</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <div class="col-6 mb-2">
+            <label class="form-label" for="subtotal" data-i18n="subtotal">Subtotal</label>
+            <input type="text" id="subtotal" class="form-control" readonly>
+          </div>
+          <div class="col-6 mb-2">
+            <label class="form-label" for="taxAmount" data-i18n="taxAmount">Tax Amount</label>
+            <input type="text" id="taxAmount" class="form-control" readonly>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-5 mb-4">
+      <div class="grand-total-box h-100 d-flex flex-column justify-content-center text-center">
+        <div class="mb-1" style="color:#3d4854;" data-i18n="grandTotalLabel">Grand Total</div>
+        <div class="amount" id="grandTotal">$0.00</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TERMS & CONDITIONS -->
+  <div class="card-section">
+    <h2><i class="fa-solid fa-file-contract me-2"></i><span data-i18n="termsSectionTitle">Terms &amp; Conditions</span></h2>
+    <p style="font-size:.85rem;color:#495057;" data-i18n="termsSectionNote">Printed on page 2 of every PDF estimate, right after the itemized total. Fill it in once — it's remembered for this session.</p>
+
+    <div class="row g-3 mb-3">
+      <div class="col-md-4">
+        <label class="form-label" for="validityDays" data-i18n="validityLabel">Quotation Validity</label>
+        <select id="validityDays" class="form-select">
+          <option value="15" selected data-i18n="validity15">15 days</option>
+          <option value="30" data-i18n="validity30">30 days</option>
+          <option value="7" data-i18n="validity7">7 days</option>
+          <option value="45" data-i18n="validity45">45 days</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row g-3 mb-2">
+      <div class="col-12">
+        <label class="form-label mb-1" data-i18n="paymentMilestonesLabel">Payment Milestones (% of total)</label>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label small" for="advancePct" data-i18n="advanceLabel">Advance (on booking / agreement)</label>
+        <div class="input-group">
+          <input type="number" id="advancePct" class="form-control" value="40" min="0" max="100" step="1" onchange="checkMilestoneTotal()" oninput="checkMilestoneTotal()">
+          <span class="input-group-text">%</span>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label small" for="interimPct" data-i18n="interimLabel">Interim (at milestone)</label>
+        <div class="input-group">
+          <input type="number" id="interimPct" class="form-control" value="30" min="0" max="100" step="1" onchange="checkMilestoneTotal()" oninput="checkMilestoneTotal()">
+          <span class="input-group-text">%</span>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label small" for="finalPct" data-i18n="finalLabel">Final Balance (on completion &amp; testing)</label>
+        <div class="input-group">
+          <input type="number" id="finalPct" class="form-control" value="30" min="0" max="100" step="1" onchange="checkMilestoneTotal()" oninput="checkMilestoneTotal()">
+          <span class="input-group-text">%</span>
+        </div>
+      </div>
+    </div>
+    <p id="milestoneSumNote" class="mb-3" style="font-size:.8rem;"></p>
+
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label" for="scopeOfWork" data-i18n="scopeLabel">Scope of Work / Materials Used</label>
+        <textarea id="scopeOfWork" class="form-control" rows="3" data-i18n-placeholder="scopePlaceholder" placeholder="e.g., Finolex wires for electrical work, Astral PVC pipes for plumbing"></textarea>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label" for="exclusions" data-i18n="exclusionsLabel">Exclusions</label>
+        <textarea id="exclusions" class="form-control" rows="3" data-i18n-placeholder="exclusionsPlaceholder" placeholder="e.g., Fixing of light fixtures not included; painting/patchwork after wall chasing excluded"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACTIONS -->
+  <div class="d-flex flex-wrap gap-2 mb-3">
+    <button class="btn btn-success btn-lg" onclick="generatePDF()">
+      <i class="fa-solid fa-file-pdf me-1"></i> <span data-i18n="generatePdfBtn">Generate PDF Estimate</span>
+    </button>
+    <button class="btn btn-outline-secondary btn-lg" onclick="resetForm()">
+      <i class="fa-solid fa-rotate-left me-1"></i> <span data-i18n="resetBtn">Reset Form</span>
+    </button>
+  </div>
+
+  <!-- SHARE -->
+  <div class="d-flex flex-wrap gap-2 mb-5">
+    <button class="btn btn-primary" onclick="shareEstimate()">
+      <i class="fa-solid fa-share-nodes me-1"></i> <span data-i18n="shareBtn">Share Estimate</span>
+    </button>
+    <button class="btn btn-outline-success" onclick="shareViaWhatsApp()">
+      <i class="fa-brands fa-whatsapp me-1"></i> <span data-i18n="shareWhatsapp">WhatsApp</span>
+    </button>
+    <button class="btn btn-outline-secondary" onclick="shareViaEmail()">
+      <i class="fa-solid fa-envelope me-1"></i> <span data-i18n="shareEmail">Email</span>
+    </button>
+  </div>
+
+  <!-- VIDEO EXPLAINER -->
+  <div class="card-section">
+    <h2><i class="fa-solid fa-circle-play me-2"></i><span data-i18n="videoTitle">See How It Works</span></h2>
+    <p class="text-muted" style="font-size:.9rem;" data-i18n="videoSubtitle">A 75-second walkthrough of how Incubill helps you quote jobs faster and grow your business.</p>
+    <div class="ratio ratio-16x9">
+      <!--
+        DEVELOPER NOTE: replace YOUR_YOUTUBE_VIDEO_ID below with the real
+        ID once your explainer video is uploaded (unlisted or public is
+        fine). The ID is the part after "v=" in a YouTube URL, e.g. for
+        https://www.youtube.com/watch?v=dQw4w9WgXcQ the ID is dQw4w9WgXcQ.
+      -->
+      <iframe
+        src="https://www.youtube-nocookie.com/embed/YOUR_YOUTUBE_VIDEO_ID"
+        title="Incubill — How It Works"
+        frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        referrerpolicy="strict-origin-when-cross-origin"
+        allowfullscreen>
+      </iframe>
+    </div>
+  </div>
+
+  <!-- WHY INCUBILL -->
+  <div class="card-section">
+    <h2><i class="fa-solid fa-star me-2"></i><span data-i18n="whyTitle">Why Incubill</span></h2>
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-4">
+        <div class="why-card">
+          <i class="fa-solid fa-robot why-icon"></i>
+          <h3 data-i18n="whyAgenticTitle">Agentic AI &amp; Hyper-Personalization</h3>
+          <p data-i18n="whyAgenticDesc">Every estimate adapts itself to your trade, your client's currency, and their language automatically — no manual setup, every time.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="why-card">
+          <i class="fa-solid fa-comments why-icon"></i>
+          <h3 data-i18n="whyConvTitle">Conversational Marketing</h3>
+          <p data-i18n="whyConvDesc">Send estimates straight into WhatsApp or email as a real conversation with your client — not a cold PDF attachment nobody opens.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="why-card">
+          <i class="fa-solid fa-video why-icon"></i>
+          <h3 data-i18n="whyVideoTitle">Zero-Click Video Search</h3>
+          <p data-i18n="whyVideoDesc">Show up where homeowners are already searching, so they find a trusted quote before they even finish typing.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="why-card">
+          <i class="fa-solid fa-magnifying-glass-chart why-icon"></i>
+          <h3 data-i18n="whyGeoTitle">GEO (Generative Engine Optimization)</h3>
+          <p data-i18n="whyGeoDesc">Built to be understood and recommended by AI tools like ChatGPT and Google AI Overviews — not just traditional search.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="why-card">
+          <i class="fa-solid fa-circle-question why-icon"></i>
+          <h3 data-i18n="whyAeoTitle">AEO (Answer Engine Optimization)</h3>
+          <p data-i18n="whyAeoDesc">Structured so voice assistants and answer engines can surface Incubill the moment someone asks "how do I quote a plumbing job."</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="why-card">
+          <i class="fa-solid fa-brain why-icon"></i>
+          <h3 data-i18n="whyAioTitle">AIO (Artificial Intelligence Optimization)</h3>
+          <p data-i18n="whyAioDesc">Every part of the tool — currency, language, trade, sharing — is tuned by AI to fit the person using it, automatically.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ABOUT / TRUST (E-E-A-T) -->
+  <div class="card-section">
+    <h2><i class="fa-solid fa-shield-halved me-2"></i><span data-i18n="aboutTitle">About Incubill</span></h2>
+    <p data-i18n="aboutP1">Incubill is a PDF estimate generator built for tradespeople — plumbers, electricians, HVAC technicians, landscapers, handymen, cleaners, and general contractors — who need to send a client a professional, itemized quote in minutes instead of an hour.</p>
+    <p data-i18n="aboutP2">Subscriptions are billed and processed by Dodo Payments, acting as Merchant of Record, with a 7-day free trial on every plan. Your payment details are handled entirely by Dodo's checkout — this page never sees or stores card information directly.</p>
+    <p data-i18n="aboutP3">The tool runs entirely in your browser: your client's name, address, and job details are never sent to or stored on an external server, aside from the one-time location lookup used to guess a starting currency (which you can always override).</p>
+  </div>
+
+  <!-- FAQ (AEO) -->
+  <div class="card-section">
+    <h2><i class="fa-solid fa-circle-question me-2"></i><span data-i18n="faqTitle">Frequently Asked Questions</span></h2>
+    <div class="faq-item">
+      <h3 data-i18n="faqQ1">Is Incubill free to use?</h3>
+      <p data-i18n="faqA1">Yes, for the first 7 days. Every subscription includes a free trial with full access, billed afterward through Dodo Payments unless you cancel first.</p>
+    </div>
+    <div class="faq-item">
+      <h3 data-i18n="faqQ2">Which trades does Incubill support?</h3>
+      <p data-i18n="faqA2">Plumbing, electrical, HVAC, landscaping, handyman work, cleaning services, and general contracting are built in, each with its own sample line items. The estimate math and PDF layout work identically for any trade.</p>
+    </div>
+    <div class="faq-item">
+      <h3 data-i18n="faqQ3">Does Incubill work in currencies other than US dollars?</h3>
+      <p data-i18n="faqA3">Yes. Incubill detects the visitor's local currency automatically and lets anyone switch to a different one manually, including USD, EUR, GBP, INR, AUD, CAD, JPY, AED, ZAR, and SGD.</p>
+    </div>
+    <div class="faq-item">
+      <h3 data-i18n="faqQ4">Can I send the estimate directly to a client?</h3>
+      <p data-i18n="faqA4">Yes. After generating the PDF, you can share it straight to WhatsApp, email, or your device's native share sheet, in addition to downloading it.</p>
+    </div>
+    <div class="faq-item">
+      <h3 data-i18n="faqQ5">Do I need to install anything to use Incubill?</h3>
+      <p data-i18n="faqA5">No. Incubill runs entirely in your web browser — there's nothing to download or install to create and send an estimate.</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- FAQPage structured data for answer engines (AEO). Keep this in sync
+     with the visible FAQ section above if you edit the questions. -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Is Incubill free to use?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, for the first 7 days. Every subscription includes a free trial with full access, billed afterward through Dodo Payments unless you cancel first."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Which trades does Incubill support?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Plumbing, electrical, HVAC, landscaping, handyman work, cleaning services, and general contracting are built in, each with its own sample line items. The estimate math and PDF layout work identically for any trade."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does Incubill work in currencies other than US dollars?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Incubill detects the visitor's local currency automatically and lets anyone switch to a different one manually, including USD, EUR, GBP, INR, AUD, CAD, JPY, AED, ZAR, and SGD."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I send the estimate directly to a client?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. After generating the PDF, you can share it straight to WhatsApp, email, or your device's native share sheet, in addition to downloading it."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do I need to install anything to use Incubill?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Incubill runs entirely in your web browser — there's nothing to download or install to create and send an estimate."
+      }
+    }
+  ]
+}
+</script>
+
+<!-- jsPDF + AutoTable -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<!-- Bootstrap JS bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+/* ---------------------------------------------------------------------
+   DODO PAYMENTS CONFIG
+   This page uses a Dodo Payments static payment link for the
+   "Subscribe Now" button:
+       https://checkout.dodopayments.com/buy/{PRODUCT_ID}?quantity=1&redirect_url={YOUR_URL}
+   1. Create TWO products in the Dodo Payments Dashboard — one billed
+      monthly, one billed yearly — and replace the two placeholder
+      Product IDs below with your real ones (each looks like
+      "pdt_xxxxxxxxxxxx"). They must be separate products in Dodo since
+      each has its own price/billing interval.
+   2. Configure the free trial length directly on each product in the
+      Dodo Payments Dashboard (Products -> your product -> Trial period),
+      since static payment links don't accept a trial-days query
+      parameter.
+   3. redirect_url tells Dodo where to send the customer after checkout;
+      it defaults to this same page, which will then show a "Subscribed!"
+      banner using the payment_id/status query params Dodo appends to
+      the URL on return.
+--------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------
+   NOTE: Dodo checkout now happens server-side (see /create-checkout/<plan>
+   in app.py), because the backend needs to attach the logged-in user's
+   email + user_id to the checkout session so the webhook can match
+   payment events back to the right account. There's no client-side
+   payment-link code here anymore — the "Subscribe" buttons on
+   subscribe.html are plain links to Flask routes, not JS-built URLs.
+
+   Also removed: the old checkSubscriptionReturn() function that showed a
+   "Thank you for subscribing" banner based on a ?status= URL param. It's
+   no longer needed — the account bar in the header already reflects the
+   real subscription status (Trial / Active / etc.) straight from the
+   database, which is more reliable than trusting a URL query param.
+--------------------------------------------------------------------- */
+
+/* ---------------------------------------------------------------------
+   CURRENCY DETECTION & FORMATTING
+   Note: this only controls what currency symbol/format is shown on the
+   estimate itself. It has no effect on Dodo Payments checkout — Dodo
+   is a Merchant of Record and localizes the subscription charge
+   currency on its own hosted checkout page based on the payer's
+   location, independently of anything here.
+--------------------------------------------------------------------- */
+let currentCurrencyCode = "USD";
+let currencyIsAuto = true;
+
+// Best-effort mapping so symbols look right even if Intl can't resolve one.
+const CURRENCY_SYMBOLS = {
+  USD: "$", EUR: "€", GBP: "£", INR: "₹", AUD: "A$", CAD: "C$",
+  JPY: "¥", AED: "د.إ", ZAR: "R", SGD: "S$",
+};
+
+function getCurrencySymbol(code) {
+  if (CURRENCY_SYMBOLS[code]) return CURRENCY_SYMBOLS[code];
+  try {
+    const parts = new Intl.NumberFormat(navigator.language || "en-US", {
+      style: "currency", currency: code, currencyDisplay: "narrowSymbol",
+    }).formatToParts(0);
+    const symbolPart = parts.find(p => p.type === "currency");
+    return symbolPart ? symbolPart.value : code;
+  } catch (e) {
+    return code;
+  }
+}
+
+function formatMoney(amount) {
+  try {
+    return new Intl.NumberFormat(navigator.language || "en-US", {
+      style: "currency",
+      currency: currentCurrencyCode,
+      currencyDisplay: "narrowSymbol",
+    }).format(amount);
+  } catch (e) {
+    // Fallback if the browser doesn't recognize the currency code
+    return `${getCurrencySymbol(currentCurrencyCode)}${amount.toFixed(2)}`;
+  }
+}
+
+function setCurrency(code, userInitiated = false) {
+  if (code === "auto") {
+    currencyIsAuto = true;
+    detectCurrencyByLocation();
+    return;
+  }
+  currencyIsAuto = false;
+  currentCurrencyCode = code;
+  refreshCurrencyDisplay();
+}
+
+function refreshCurrencyDisplay() {
+  const symbol = getCurrencySymbol(currentCurrencyCode);
+
+  document.getElementById("unitPriceHeader").textContent = t("unitPriceHeader").replace("{symbol}", symbol);
+  document.getElementById("totalHeader").textContent = t("totalHeader").replace("{symbol}", symbol);
+  document.getElementById("travelFeeCurrencyLabel").textContent = symbol;
+
+  const note = document.getElementById("currencyDetectNote");
+  note.textContent = currencyIsAuto ? `Detected: ${currentCurrencyCode}` : "";
+
+  calculateTotals();
+}
+
+async function detectCurrencyByLocation() {
+  const note = document.getElementById("currencyDetectNote");
+  note.textContent = "Detecting location…";
+  try {
+    // Free IP-geolocation lookup; no key required for light usage.
+    const res = await fetch("https://ipapi.co/json/");
+    if (!res.ok) throw new Error("Lookup failed");
+    const data = await res.json();
+    if (data && data.currency) {
+      currentCurrencyCode = data.currency;
+    } else {
+      currentCurrencyCode = guessCurrencyFromLocale();
+    }
+  } catch (e) {
+    // Fall back to guessing from the browser's locale if the lookup
+    // fails (e.g. offline, blocked, rate-limited).
+    currentCurrencyCode = guessCurrencyFromLocale();
+  }
+  refreshCurrencyDisplay();
+}
+
+function guessCurrencyFromLocale() {
+  const locale = navigator.language || "en-US";
+  const region = locale.split("-")[1];
+  const REGION_CURRENCY = {
+    US: "USD", GB: "GBP", IN: "INR", AU: "AUD", CA: "CAD",
+    JP: "JPY", AE: "AED", ZA: "ZAR", SG: "SGD",
+    DE: "EUR", FR: "EUR", ES: "EUR", IT: "EUR", NL: "EUR", IE: "EUR",
+  };
+  return REGION_CURRENCY[region] || "USD";
+}
+
+/* ---------------------------------------------------------------------
+   LANGUAGE / i18n
+   Screen text is translated for every language listed here. The PDF
+   (generated with jsPDF's built-in Helvetica font) only supports Latin
+   characters, so PDF text uses the "pdf" fallback for hi/ar — those two
+   are screen-only until a custom embedded font is added (see the note
+   inside generatePDF()).
+--------------------------------------------------------------------- */
+const LATIN_SCRIPT_LANGS = ["en", "es", "fr", "de", "pt", "it"];
+
+const TRANSLATIONS = {
+  en: {
+    headerTagline: "Professional PDF estimates in minutes",
+    genericHeaderTagline: "All-Trades Estimate Tool",
+    subscribeBtn: "Subscribe Now (7-Day Free Trial)",
+    planMonthly: "Monthly",
+    planYearlyLabel: "Yearly",
+    planYearlySaveBadge: "Save",
+    subscribedDefault: "Thank you for subscribing! You now have full access.",
+    subscribedSuccess: "🎉 Thank you for subscribing! You now have full access to Incubill.",
+    subscribedFailed: "Your checkout was not completed. You can try subscribing again anytime.",
+    businessInfoTitle: "Your Business Details",
+    businessInfoNote: "This appears at the top of every PDF estimate instead of a placeholder. Fill it in once — it's remembered for this session.",
+    businessName: "Company Name",
+    businessAddress: "Company Address",
+    businessPhone: "Phone Number",
+    businessGstin: "GSTIN / Tax ID (optional)",
+    termsSectionTitle: "Terms & Conditions",
+    termsSectionNote: "Printed on page 2 of every PDF estimate, right after the itemized total. Fill it in once — it's remembered for this session.",
+    validityLabel: "Quotation Validity",
+    validity7: "7 days",
+    validity15: "15 days",
+    validity30: "30 days",
+    validity45: "45 days",
+    paymentMilestonesLabel: "Payment Milestones (% of total)",
+    advanceLabel: "Advance (on booking / agreement)",
+    interimLabel: "Interim (at milestone)",
+    finalLabel: "Final Balance (on completion & testing)",
+    milestoneSumWarning: "Milestones should total 100%",
+    scopeLabel: "Scope of Work / Materials Used",
+    scopePlaceholder: "e.g., Finolex wires for electrical work, Astral PVC pipes for plumbing",
+    exclusionsLabel: "Exclusions",
+    exclusionsPlaceholder: "e.g., Fixing of light fixtures not included; painting/patchwork after wall chasing excluded",
+    clientInfoTitle: "Client Information",
+    clientName: "Client Name",
+    clientEmail: "Client Email",
+    clientAddress: "Client Address",
+    estimateDate: "Estimate Date",
+    estimateNumber: "Estimate Number",
+    jobDetailsTitle: "Job Details",
+    description: "Description",
+    quantity: "Quantity",
+    unitPriceHeader: "Unit Price ({symbol})",
+    totalHeader: "Total ({symbol})",
+    addRow: "Add Row",
+    itemSuggestHint: "Tip: start typing in Description for common items for your trade, with suggested pricing.",
+    rowActions: "Actions",
+    rowLabelPrefix: "row",
+    deleteRowLabel: "Delete row",
+    travelFeeAmountLabel: "Travel fee amount",
+    summaryTitle: "Summary & Options",
+    travelFee: "Add Travel Fee",
+    taxRate: "Tax Rate",
+    subtotal: "Subtotal",
+    taxAmount: "Tax Amount",
+    grandTotalLabel: "Grand Total",
+    generatePdfBtn: "Generate PDF Estimate",
+    resetBtn: "Reset Form",
+    shareBtn: "Share Estimate",
+    shareWhatsapp: "WhatsApp",
+    shareEmail: "Email",
+    shareFallbackNote: "Your PDF has been downloaded. Attach it to your WhatsApp or email message to send it.",
+    shareAttachNote: "(Estimate PDF attached — please attach the downloaded file if it isn't already.)",
+    alertClientNameRequired: "Please enter the client's name before generating an estimate.",
+    confirmReset: "Are you sure you want to reset the form? All entered data will be lost.",
+    confirmTradeSwitch: "Switch trade and load its sample line items? Your current rows will be replaced.",
+    whyTitle: "Why Incubill",
+    videoTitle: "See How It Works",
+    videoSubtitle: "A 75-second walkthrough of how Incubill helps you quote jobs faster and grow your business.",
+    whyAgenticTitle: "Agentic AI & Hyper-Personalization",
+    whyAgenticDesc: "Every estimate adapts itself to your trade, your client's currency, and their language automatically — no manual setup, every time.",
+    whyConvTitle: "Conversational Marketing",
+    whyConvDesc: "Send estimates straight into WhatsApp or email as a real conversation with your client — not a cold PDF attachment nobody opens.",
+    whyVideoTitle: "Zero-Click Video Search",
+    whyVideoDesc: "Show up where homeowners are already searching, so they find a trusted quote before they even finish typing.",
+    whyGeoTitle: "GEO (Generative Engine Optimization)",
+    whyGeoDesc: "Built to be understood and recommended by AI tools like ChatGPT and Google AI Overviews — not just traditional search.",
+    whyAeoTitle: "AEO (Answer Engine Optimization)",
+    whyAeoDesc: "Structured so voice assistants and answer engines can surface Incubill the moment someone asks \"how do I quote a plumbing job.\"",
+    whyAioTitle: "AIO (Artificial Intelligence Optimization)",
+    whyAioDesc: "Every part of the tool — currency, language, trade, sharing — is tuned by AI to fit the person using it, automatically.",
+    aboutTitle: "About Incubill",
+    aboutP1: "Incubill is a PDF estimate generator built for tradespeople — plumbers, electricians, HVAC technicians, landscapers, handymen, cleaners, and general contractors — who need to send a client a professional, itemized quote in minutes instead of an hour.",
+    aboutP2: "Subscriptions are billed and processed by Dodo Payments, acting as Merchant of Record, with a 7-day free trial on every plan. Your payment details are handled entirely by Dodo's checkout — this page never sees or stores card information directly.",
+    aboutP3: "The tool runs entirely in your browser: your client's name, address, and job details are never sent to or stored on an external server, aside from the one-time location lookup used to guess a starting currency (which you can always override).",
+    faqTitle: "Frequently Asked Questions",
+    faqQ1: "Is Incubill free to use?",
+    faqA1: "Yes, for the first 7 days. Every subscription includes a free trial with full access, billed afterward through Dodo Payments unless you cancel first.",
+    faqQ2: "Which trades does Incubill support?",
+    faqA2: "Plumbing, electrical, HVAC, landscaping, handyman work, cleaning services, and general contracting are built in, each with its own sample line items. The estimate math and PDF layout work identically for any trade.",
+    faqQ3: "Does Incubill work in currencies other than US dollars?",
+    faqA3: "Yes. Incubill detects the visitor's local currency automatically and lets anyone switch to a different one manually, including USD, EUR, GBP, INR, AUD, CAD, JPY, AED, ZAR, and SGD.",
+    faqQ4: "Can I send the estimate directly to a client?",
+    faqA4: "Yes. After generating the PDF, you can share it straight to WhatsApp, email, or your device's native share sheet, in addition to downloading it.",
+    faqQ5: "Do I need to install anything to use Incubill?",
+    faqA5: "No. Incubill runs entirely in your web browser — there's nothing to download or install to create and send an estimate.",
+    pdf: {
+      title: "PROFESSIONAL ESTIMATE",
+      companyPlaceholder: "Your Company Name | 123 Pipe Lane | (555) 123-4567",
+      billTo: "Bill To:",
+      estimateDate: "Estimate Date:",
+      estimateNumber: "Estimate #:",
+      qty: "Qty", description: "Description", unitPrice: "Unit Price", total: "Total",
+      subtotal: "Subtotal:", travelFee: "Travel Fee:", tax: "Tax", grandTotal: "Grand Total:",
+      terms: "Terms: Payment due upon receipt. Please make checks payable to [Your Company].",
+      footer: "Thank you for your business!",
+      gstinPrefix: "GSTIN:",
+      termsHeading: "TERMS & CONDITIONS",
+      validityHeading: "Validity Period",
+      validityText: "This quotation is valid for {days} days from the date of issue. Prices and material availability are not guaranteed beyond this period.",
+      paymentMilestonesHeading: "Payment Milestones",
+      advance: "Advance — due on booking / agreement signing:",
+      interim: "Interim — due at agreed milestone:",
+      finalBalance: "Final Balance — due on completion & testing:",
+      scopeHeading: "Scope of Work / Materials",
+      scopeDefault: "Materials, brands, and exact quantities to be used will be confirmed in writing before work begins. Any change in scope will be quoted separately.",
+      exclusionsHeading: "Exclusions",
+      exclusionsDefault: "This quotation excludes any work, fixtures, or materials not explicitly listed above. Additional repairs found during the job will be quoted separately before proceeding.",
+      contractorSignature: "Contractor Signature",
+      clientSignature: "Client Signature",
+    },
+  },
+  es: {
+    headerTagline: "Presupuestos profesionales en PDF en minutos",
+    subscribeBtn: "Suscríbete ahora (prueba gratis de 7 días)",
+    subscribedDefault: "¡Gracias por suscribirte! Ahora tienes acceso completo.",
+    subscribedSuccess: "🎉 ¡Gracias por suscribirte! Ahora tienes acceso completo a Incubill.",
+    subscribedFailed: "El pago no se completó. Puedes intentarlo de nuevo cuando quieras.",
+    clientInfoTitle: "Información del Cliente",
+    clientName: "Nombre del Cliente",
+    clientEmail: "Correo del Cliente",
+    clientAddress: "Dirección del Cliente",
+    estimateDate: "Fecha del Presupuesto",
+    estimateNumber: "Número de Presupuesto",
+    jobDetailsTitle: "Detalles del Trabajo",
+    description: "Descripción",
+    quantity: "Cantidad",
+    unitPriceHeader: "Precio Unitario ({symbol})",
+    totalHeader: "Total ({symbol})",
+    addRow: "Añadir Fila",
+    summaryTitle: "Resumen y Opciones",
+    travelFee: "Añadir Cargo de Viaje",
+    taxRate: "Tasa de Impuesto",
+    subtotal: "Subtotal",
+    taxAmount: "Monto del Impuesto",
+    grandTotalLabel: "Total General",
+    generatePdfBtn: "Generar Presupuesto PDF",
+    resetBtn: "Restablecer Formulario",
+    shareBtn: "Compartir Presupuesto",
+    shareWhatsapp: "WhatsApp",
+    shareEmail: "Correo",
+    shareFallbackNote: "Tu PDF se ha descargado. Adjúntalo a tu mensaje de WhatsApp o correo para enviarlo.",
+    shareAttachNote: "(PDF del presupuesto adjunto — por favor adjunta el archivo descargado si no lo está ya.)",
+    alertClientNameRequired: "Por favor ingresa el nombre del cliente antes de generar el presupuesto.",
+    confirmReset: "¿Seguro que quieres restablecer el formulario? Se perderán todos los datos.",
+    confirmTradeSwitch: "¿Cambiar de oficio y cargar sus artículos de ejemplo? Se reemplazarán las filas actuales.",
+    pdf: {
+      title: "PRESUPUESTO PROFESIONAL",
+      companyPlaceholder: "Nombre de tu Empresa | Calle Principal 123 | (555) 123-4567",
+      billTo: "Facturar a:",
+      estimateDate: "Fecha:",
+      estimateNumber: "Presupuesto N.º:",
+      qty: "Cant.", description: "Descripción", unitPrice: "Precio Unit.", total: "Total",
+      subtotal: "Subtotal:", travelFee: "Cargo de Viaje:", tax: "Impuesto", grandTotal: "Total General:",
+      terms: "Términos: Pago a la entrega. Cheques a nombre de [Tu Empresa].",
+      footer: "¡Gracias por su preferencia!",
+      gstinPrefix: "NIF/GSTIN:",
+      termsHeading: "TÉRMINOS Y CONDICIONES",
+      validityHeading: "Período de Validez",
+      validityText: "Este presupuesto es válido durante {days} días desde la fecha de emisión. Los precios y la disponibilidad de materiales no se garantizan después de este período.",
+      paymentMilestonesHeading: "Hitos de Pago",
+      advance: "Anticipo — al reservar / firmar el acuerdo:",
+      interim: "Pago intermedio — al alcanzar el hito acordado:",
+      finalBalance: "Saldo final — al finalizar y probar el trabajo:",
+      scopeHeading: "Alcance del Trabajo / Materiales",
+      scopeDefault: "Los materiales, marcas y cantidades exactas se confirmarán por escrito antes de iniciar el trabajo. Cualquier cambio de alcance se cotizará por separado.",
+      exclusionsHeading: "Exclusiones",
+      exclusionsDefault: "Este presupuesto excluye cualquier trabajo, accesorio o material no listado explícitamente arriba. Las reparaciones adicionales encontradas durante el trabajo se cotizarán por separado antes de proceder.",
+      contractorSignature: "Firma del Contratista",
+      clientSignature: "Firma del Cliente",
+    },
+  },
+  fr: {
+    headerTagline: "Devis PDF professionnels en quelques minutes",
+    subscribeBtn: "Abonnez-vous (essai gratuit de 7 jours)",
+    subscribedDefault: "Merci de votre abonnement ! Vous avez maintenant un accès complet.",
+    subscribedSuccess: "🎉 Merci de votre abonnement ! Vous avez maintenant un accès complet à Incubill.",
+    subscribedFailed: "Le paiement n'a pas été finalisé. Vous pouvez réessayer à tout moment.",
+    clientInfoTitle: "Informations Client",
+    clientName: "Nom du Client",
+    clientEmail: "E-mail du Client",
+    clientAddress: "Adresse du Client",
+    estimateDate: "Date du Devis",
+    estimateNumber: "Numéro de Devis",
+    jobDetailsTitle: "Détails des Travaux",
+    description: "Description",
+    quantity: "Quantité",
+    unitPriceHeader: "Prix Unitaire ({symbol})",
+    totalHeader: "Total ({symbol})",
+    addRow: "Ajouter une Ligne",
+    summaryTitle: "Résumé et Options",
+    travelFee: "Ajouter des Frais de Déplacement",
+    taxRate: "Taux de Taxe",
+    subtotal: "Sous-total",
+    taxAmount: "Montant de la Taxe",
+    grandTotalLabel: "Total Général",
+    generatePdfBtn: "Générer le Devis PDF",
+    resetBtn: "Réinitialiser le Formulaire",
+    shareBtn: "Partager le Devis",
+    shareWhatsapp: "WhatsApp",
+    shareEmail: "E-mail",
+    shareFallbackNote: "Votre PDF a été téléchargé. Joignez-le à votre message WhatsApp ou e-mail pour l'envoyer.",
+    shareAttachNote: "(PDF du devis joint — veuillez joindre le fichier téléchargé s'il ne l'est pas déjà.)",
+    alertClientNameRequired: "Veuillez saisir le nom du client avant de générer le devis.",
+    confirmReset: "Voulez-vous vraiment réinitialiser le formulaire ? Toutes les données seront perdues.",
+    confirmTradeSwitch: "Changer de métier et charger ses articles types ? Les lignes actuelles seront remplacées.",
+    pdf: {
+      title: "DEVIS PROFESSIONNEL",
+      companyPlaceholder: "Nom de votre entreprise | 123 Rue Principale | (555) 123-4567",
+      billTo: "Facturer à :",
+      estimateDate: "Date du devis :",
+      estimateNumber: "Devis n° :",
+      qty: "Qté", description: "Description", unitPrice: "Prix Unit.", total: "Total",
+      subtotal: "Sous-total :", travelFee: "Frais de Déplacement :", tax: "Taxe", grandTotal: "Total Général :",
+      terms: "Conditions : Paiement à réception. Chèques à l'ordre de [Votre Entreprise].",
+      footer: "Merci de votre confiance !",
+      gstinPrefix: "N° TVA :",
+      termsHeading: "TERMES ET CONDITIONS",
+      validityHeading: "Période de Validité",
+      validityText: "Ce devis est valable {days} jours à compter de la date d'émission. Les prix et la disponibilité des matériaux ne sont pas garantis au-delà de cette période.",
+      paymentMilestonesHeading: "Échéances de Paiement",
+      advance: "Acompte — à la réservation / signature de l'accord :",
+      interim: "Paiement intermédiaire — à l'étape convenue :",
+      finalBalance: "Solde final — à l'achèvement et aux essais :",
+      scopeHeading: "Périmètre des Travaux / Matériaux",
+      scopeDefault: "Les matériaux, marques et quantités exactes seront confirmés par écrit avant le début des travaux. Tout changement de périmètre fera l'objet d'un devis séparé.",
+      exclusionsHeading: "Exclusions",
+      exclusionsDefault: "Ce devis exclut tout travail, accessoire ou matériau non explicitement listé ci-dessus. Les réparations supplémentaires constatées en cours de chantier feront l'objet d'un devis séparé avant exécution.",
+      contractorSignature: "Signature de l'Entrepreneur",
+      clientSignature: "Signature du Client",
+    },
+  },
+  de: {
+    headerTagline: "Professionelle PDF-Kostenvoranschläge in Minuten",
+    subscribeBtn: "Jetzt abonnieren (7 Tage kostenlos testen)",
+    subscribedDefault: "Danke für dein Abonnement! Du hast jetzt vollen Zugriff.",
+    subscribedSuccess: "🎉 Danke für dein Abonnement! Du hast jetzt vollen Zugriff auf Incubill.",
+    subscribedFailed: "Die Zahlung wurde nicht abgeschlossen. Du kannst es jederzeit erneut versuchen.",
+    clientInfoTitle: "Kundeninformationen",
+    clientName: "Kundenname",
+    clientEmail: "Kunden-E-Mail",
+    clientAddress: "Kundenadresse",
+    estimateDate: "Datum des Angebots",
+    estimateNumber: "Angebotsnummer",
+    jobDetailsTitle: "Auftragsdetails",
+    description: "Beschreibung",
+    quantity: "Menge",
+    unitPriceHeader: "Einzelpreis ({symbol})",
+    totalHeader: "Gesamt ({symbol})",
+    addRow: "Zeile Hinzufügen",
+    summaryTitle: "Zusammenfassung & Optionen",
+    travelFee: "Anfahrtspauschale Hinzufügen",
+    taxRate: "Steuersatz",
+    subtotal: "Zwischensumme",
+    taxAmount: "Steuerbetrag",
+    grandTotalLabel: "Gesamtsumme",
+    generatePdfBtn: "PDF-Angebot Erstellen",
+    resetBtn: "Formular Zurücksetzen",
+    shareBtn: "Angebot Teilen",
+    shareWhatsapp: "WhatsApp",
+    shareEmail: "E-Mail",
+    shareFallbackNote: "Ihr PDF wurde heruntergeladen. Hängen Sie es Ihrer WhatsApp- oder E-Mail-Nachricht an, um es zu senden.",
+    shareAttachNote: "(PDF-Angebot angehängt — bitte hängen Sie die heruntergeladene Datei an, falls noch nicht geschehen.)",
+    alertClientNameRequired: "Bitte gib den Namen des Kunden ein, bevor du das Angebot erstellst.",
+    confirmReset: "Möchtest du das Formular wirklich zurücksetzen? Alle Daten gehen verloren.",
+    confirmTradeSwitch: "Gewerk wechseln und Beispielpositionen laden? Aktuelle Zeilen werden ersetzt.",
+    pdf: {
+      title: "PROFESSIONELLES ANGEBOT",
+      companyPlaceholder: "Ihr Firmenname | Musterstraße 123 | (555) 123-4567",
+      billTo: "Rechnung an:",
+      estimateDate: "Angebotsdatum:",
+      estimateNumber: "Angebots-Nr.:",
+      qty: "Menge", description: "Beschreibung", unitPrice: "Einzelpreis", total: "Gesamt",
+      subtotal: "Zwischensumme:", travelFee: "Anfahrtspauschale:", tax: "Steuer", grandTotal: "Gesamtsumme:",
+      terms: "Bedingungen: Zahlung bei Erhalt fällig. Schecks an [Ihre Firma].",
+      footer: "Vielen Dank für Ihr Vertrauen!",
+      gstinPrefix: "USt-IdNr.:",
+      termsHeading: "GESCHÄFTSBEDINGUNGEN",
+      validityHeading: "Gültigkeitszeitraum",
+      validityText: "Dieses Angebot ist {days} Tage ab Ausstellungsdatum gültig. Preise und Materialverfügbarkeit werden nach diesem Zeitraum nicht garantiert.",
+      paymentMilestonesHeading: "Zahlungsmeilensteine",
+      advance: "Anzahlung — fällig bei Buchung / Vertragsunterzeichnung:",
+      interim: "Zwischenzahlung — fällig bei vereinbartem Meilenstein:",
+      finalBalance: "Restzahlung — fällig bei Fertigstellung & Abnahme:",
+      scopeHeading: "Leistungsumfang / Materialien",
+      scopeDefault: "Materialien, Marken und genaue Mengen werden vor Arbeitsbeginn schriftlich bestätigt. Jede Änderung des Leistungsumfangs wird separat angeboten.",
+      exclusionsHeading: "Ausschlüsse",
+      exclusionsDefault: "Dieses Angebot schließt jegliche Arbeiten, Armaturen oder Materialien aus, die oben nicht ausdrücklich aufgeführt sind. Während der Arbeit festgestellte zusätzliche Reparaturen werden vor Fortsetzung separat angeboten.",
+      contractorSignature: "Unterschrift Auftragnehmer",
+      clientSignature: "Unterschrift Kunde",
+    },
+  },
+  pt: {
+    headerTagline: "Orçamentos profissionais em PDF em minutos",
+    subscribeBtn: "Assine Agora (teste grátis de 7 dias)",
+    subscribedDefault: "Obrigado por assinar! Agora você tem acesso completo.",
+    subscribedSuccess: "🎉 Obrigado por assinar! Agora você tem acesso completo ao Incubill.",
+    subscribedFailed: "O pagamento não foi concluído. Você pode tentar novamente quando quiser.",
+    clientInfoTitle: "Informações do Cliente",
+    clientName: "Nome do Cliente",
+    clientEmail: "E-mail do Cliente",
+    clientAddress: "Endereço do Cliente",
+    estimateDate: "Data do Orçamento",
+    estimateNumber: "Número do Orçamento",
+    jobDetailsTitle: "Detalhes do Serviço",
+    description: "Descrição",
+    quantity: "Quantidade",
+    unitPriceHeader: "Preço Unitário ({symbol})",
+    totalHeader: "Total ({symbol})",
+    addRow: "Adicionar Linha",
+    summaryTitle: "Resumo e Opções",
+    travelFee: "Adicionar Taxa de Deslocamento",
+    taxRate: "Taxa de Imposto",
+    subtotal: "Subtotal",
+    taxAmount: "Valor do Imposto",
+    grandTotalLabel: "Total Geral",
+    generatePdfBtn: "Gerar Orçamento em PDF",
+    resetBtn: "Redefinir Formulário",
+    shareBtn: "Compartilhar Orçamento",
+    shareWhatsapp: "WhatsApp",
+    shareEmail: "E-mail",
+    shareFallbackNote: "Seu PDF foi baixado. Anexe-o à sua mensagem do WhatsApp ou e-mail para enviá-lo.",
+    shareAttachNote: "(PDF do orçamento anexado — anexe o arquivo baixado se ainda não estiver.)",
+    alertClientNameRequired: "Insira o nome do cliente antes de gerar o orçamento.",
+    confirmReset: "Tem certeza de que deseja redefinir o formulário? Todos os dados serão perdidos.",
+    confirmTradeSwitch: "Trocar de profissão e carregar seus itens de exemplo? As linhas atuais serão substituídas.",
+    pdf: {
+      title: "ORÇAMENTO PROFISSIONAL",
+      companyPlaceholder: "Nome da sua Empresa | Rua Principal, 123 | (555) 123-4567",
+      billTo: "Faturar para:",
+      estimateDate: "Data do Orçamento:",
+      estimateNumber: "Orçamento Nº:",
+      qty: "Qtd", description: "Descrição", unitPrice: "Preço Unit.", total: "Total",
+      subtotal: "Subtotal:", travelFee: "Taxa de Deslocamento:", tax: "Imposto", grandTotal: "Total Geral:",
+      terms: "Termos: Pagamento devido no recebimento. Cheques em nome de [Sua Empresa].",
+      footer: "Obrigado pela preferência!",
+      gstinPrefix: "NIF/GSTIN:",
+      termsHeading: "TERMOS E CONDIÇÕES",
+      validityHeading: "Período de Validade",
+      validityText: "Este orçamento é válido por {days} dias a partir da data de emissão. Preços e disponibilidade de materiais não são garantidos após este período.",
+      paymentMilestonesHeading: "Marcos de Pagamento",
+      advance: "Adiantamento — devido na reserva / assinatura do acordo:",
+      interim: "Pagamento intermediário — devido no marco acordado:",
+      finalBalance: "Saldo final — devido na conclusão e teste:",
+      scopeHeading: "Escopo do Trabalho / Materiais",
+      scopeDefault: "Materiais, marcas e quantidades exatas serão confirmados por escrito antes do início do trabalho. Qualquer alteração no escopo será orçada separadamente.",
+      exclusionsHeading: "Exclusões",
+      exclusionsDefault: "Este orçamento exclui qualquer trabalho, acessório ou material não listado explicitamente acima. Reparos adicionais encontrados durante o trabalho serão orçados separadamente antes de prosseguir.",
+      contractorSignature: "Assinatura do Contratante",
+      clientSignature: "Assinatura do Cliente",
+    },
+  },
+  it: {
+    headerTagline: "Preventivi PDF professionali in pochi minuti",
+    subscribeBtn: "Abbonati Ora (prova gratuita di 7 giorni)",
+    subscribedDefault: "Grazie per l'iscrizione! Ora hai accesso completo.",
+    subscribedSuccess: "🎉 Grazie per l'iscrizione! Ora hai accesso completo a Incubill.",
+    subscribedFailed: "Il pagamento non è stato completato. Puoi riprovare quando vuoi.",
+    clientInfoTitle: "Informazioni Cliente",
+    clientName: "Nome Cliente",
+    clientEmail: "Email Cliente",
+    clientAddress: "Indirizzo Cliente",
+    estimateDate: "Data Preventivo",
+    estimateNumber: "Numero Preventivo",
+    jobDetailsTitle: "Dettagli Lavoro",
+    description: "Descrizione",
+    quantity: "Quantità",
+    unitPriceHeader: "Prezzo Unitario ({symbol})",
+    totalHeader: "Totale ({symbol})",
+    addRow: "Aggiungi Riga",
+    summaryTitle: "Riepilogo e Opzioni",
+    travelFee: "Aggiungi Costo di Trasferta",
+    taxRate: "Aliquota Fiscale",
+    subtotal: "Subtotale",
+    taxAmount: "Importo Imposta",
+    grandTotalLabel: "Totale Generale",
+    generatePdfBtn: "Genera Preventivo PDF",
+    resetBtn: "Reimposta Modulo",
+    shareBtn: "Condividi Preventivo",
+    shareWhatsapp: "WhatsApp",
+    shareEmail: "Email",
+    shareFallbackNote: "Il tuo PDF è stato scaricato. Allegalo al tuo messaggio WhatsApp o email per inviarlo.",
+    shareAttachNote: "(PDF del preventivo allegato — allega il file scaricato se non è già allegato.)",
+    alertClientNameRequired: "Inserisci il nome del cliente prima di generare il preventivo.",
+    confirmReset: "Sei sicuro di voler reimpostare il modulo? Tutti i dati inseriti andranno persi.",
+    confirmTradeSwitch: "Cambiare mestiere e caricare gli articoli di esempio? Le righe attuali verranno sostituite.",
+    pdf: {
+      title: "PREVENTIVO PROFESSIONALE",
+      companyPlaceholder: "Nome Azienda | Via Roma 123 | (555) 123-4567",
+      billTo: "Fatturare a:",
+      estimateDate: "Data Preventivo:",
+      estimateNumber: "Preventivo N.:",
+      qty: "Qtà", description: "Descrizione", unitPrice: "Prezzo Unit.", total: "Totale",
+      subtotal: "Subtotale:", travelFee: "Costo di Trasferta:", tax: "Imposta", grandTotal: "Totale Generale:",
+      terms: "Termini: Pagamento dovuto alla ricezione. Assegni intestati a [La Tua Azienda].",
+      footer: "Grazie per la fiducia!",
+      gstinPrefix: "P.IVA:",
+      termsHeading: "TERMINI E CONDIZIONI",
+      validityHeading: "Periodo di Validità",
+      validityText: "Questo preventivo è valido per {days} giorni dalla data di emissione. Prezzi e disponibilità dei materiali non sono garantiti oltre questo periodo.",
+      paymentMilestonesHeading: "Scadenze di Pagamento",
+      advance: "Acconto — dovuto alla prenotazione / firma dell'accordo:",
+      interim: "Pagamento intermedio — dovuto al raggiungimento della fase concordata:",
+      finalBalance: "Saldo finale — dovuto al completamento e collaudo:",
+      scopeHeading: "Ambito del Lavoro / Materiali",
+      scopeDefault: "Materiali, marche e quantità esatte saranno confermati per iscritto prima dell'inizio dei lavori. Qualsiasi modifica all'ambito sarà preventivata separatamente.",
+      exclusionsHeading: "Esclusioni",
+      exclusionsDefault: "Questo preventivo esclude qualsiasi lavoro, accessorio o materiale non esplicitamente elencato sopra. Eventuali riparazioni aggiuntive riscontrate durante il lavoro saranno preventivate separatamente prima di procedere.",
+      contractorSignature: "Firma dell'Appaltatore",
+      clientSignature: "Firma del Cliente",
+    },
+  },
+  hi: {
+    headerTagline: "मिनटों में पेशेवर पीडीएफ अनुमान",
+    subscribeBtn: "अभी सब्सक्राइब करें (7-दिन का मुफ्त ट्रायल)",
+    subscribedDefault: "सब्सक्राइब करने के लिए धन्यवाद! अब आपकी पूरी पहुंच है।",
+    subscribedSuccess: "🎉 सब्सक्राइब करने के लिए धन्यवाद! अब आपकी Incubill तक पूरी पहुंच है।",
+    subscribedFailed: "भुगतान पूरा नहीं हुआ। आप कभी भी फिर से प्रयास कर सकते हैं।",
+    clientInfoTitle: "ग्राहक जानकारी",
+    clientName: "ग्राहक का नाम",
+    clientEmail: "ग्राहक ईमेल",
+    clientAddress: "ग्राहक का पता",
+    estimateDate: "अनुमान की तारीख",
+    estimateNumber: "अनुमान संख्या",
+    jobDetailsTitle: "कार्य विवरण",
+    description: "विवरण",
+    quantity: "मात्रा",
+    unitPriceHeader: "इकाई मूल्य ({symbol})",
+    totalHeader: "कुल ({symbol})",
+    addRow: "पंक्ति जोड़ें",
+    summaryTitle: "सारांश और विकल्प",
+    travelFee: "यात्रा शुल्क जोड़ें",
+    taxRate: "कर दर",
+    subtotal: "उप-योग",
+    taxAmount: "कर राशि",
+    grandTotalLabel: "कुल योग",
+    generatePdfBtn: "पीडीएफ अनुमान बनाएं",
+    resetBtn: "फॉर्म रीसेट करें",
+    shareBtn: "अनुमान साझा करें",
+    shareWhatsapp: "व्हाट्सएप",
+    shareEmail: "ईमेल",
+    shareFallbackNote: "आपकी पीडीएफ डाउनलोड हो गई है। इसे भेजने के लिए अपने व्हाट्सएप या ईमेल संदेश में जोड़ें।",
+    shareAttachNote: "(अनुमान पीडीएफ संलग्न है — कृपया डाउनलोड की गई फ़ाइल संलग्न करें यदि पहले से नहीं है।)",
+    alertClientNameRequired: "अनुमान बनाने से पहले कृपया ग्राहक का नाम दर्ज करें।",
+    confirmReset: "क्या आप वाकई फॉर्म रीसेट करना चाहते हैं? सभी डेटा खो जाएगा।",
+    confirmTradeSwitch: "व्यापार बदलें और उसके नमूना आइटम लोड करें? वर्तमान पंक्तियां बदल दी जाएंगी।",
+    // PDF text falls back to English (see LATIN_SCRIPT_LANGS) since the
+    // default PDF font can't render Devanagari glyphs.
+    pdf: null,
+  },
+  ar: {
+    headerTagline: "عروض أسعار PDF احترافية في دقائق",
+    subscribeBtn: "اشترك الآن (تجربة مجانية 7 أيام)",
+    subscribedDefault: "شكراً لاشتراكك! أصبح لديك الآن وصول كامل.",
+    subscribedSuccess: "🎉 شكراً لاشتراكك! أصبح لديك الآن وصول كامل إلى Incubill.",
+    subscribedFailed: "لم تكتمل عملية الدفع. يمكنك المحاولة مرة أخرى في أي وقت.",
+    clientInfoTitle: "معلومات العميل",
+    clientName: "اسم العميل",
+    clientEmail: "البريد الإلكتروني للعميل",
+    clientAddress: "عنوان العميل",
+    estimateDate: "تاريخ العرض",
+    estimateNumber: "رقم العرض",
+    jobDetailsTitle: "تفاصيل العمل",
+    description: "الوصف",
+    quantity: "الكمية",
+    unitPriceHeader: "سعر الوحدة ({symbol})",
+    totalHeader: "الإجمالي ({symbol})",
+    addRow: "إضافة صف",
+    summaryTitle: "الملخص والخيارات",
+    travelFee: "إضافة رسوم التنقل",
+    taxRate: "معدل الضريبة",
+    subtotal: "المجموع الفرعي",
+    taxAmount: "مبلغ الضريبة",
+    grandTotalLabel: "الإجمالي الكلي",
+    generatePdfBtn: "إنشاء عرض أسعار PDF",
+    resetBtn: "إعادة تعيين النموذج",
+    shareBtn: "مشاركة العرض",
+    shareWhatsapp: "واتساب",
+    shareEmail: "البريد الإلكتروني",
+    shareFallbackNote: "تم تنزيل ملف PDF الخاص بك. أرفقه برسالة واتساب أو البريد الإلكتروني لإرساله.",
+    shareAttachNote: "(تم إرفاق عرض الأسعار بصيغة PDF — يرجى إرفاق الملف الذي تم تنزيله إذا لم يكن مرفقاً بالفعل.)",
+    alertClientNameRequired: "الرجاء إدخال اسم العميل قبل إنشاء العرض.",
+    confirmReset: "هل أنت متأكد أنك تريد إعادة تعيين النموذج؟ سيتم فقدان جميع البيانات المدخلة.",
+    confirmTradeSwitch: "تبديل الحرفة وتحميل عناصرها النموذجية؟ سيتم استبدال الصفوف الحالية.",
+    // PDF text falls back to English (see LATIN_SCRIPT_LANGS) since the
+    // default PDF font can't render Arabic glyphs.
+    pdf: null,
+  },
+};
+
+let currentLangCode = "en";
+let languageIsAuto = true;
+
+function t(key) {
+  const dict = TRANSLATIONS[currentLangCode] || TRANSLATIONS.en;
+  return dict[key] !== undefined ? dict[key] : TRANSLATIONS.en[key];
+}
+
+function tPdf(key) {
+  const dict = TRANSLATIONS[currentLangCode];
+  const pdfDict = (dict && dict.pdf) ? dict.pdf : TRANSLATIONS.en.pdf;
+  return pdfDict[key];
+}
+
+function applyLanguage() {
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    const key = el.getAttribute("data-i18n");
+    const val = t(key);
+    if (val !== undefined) el.textContent = val;
+  });
+
+  document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+    const key = el.getAttribute("data-i18n-placeholder");
+    const val = t(key);
+    if (val !== undefined) el.setAttribute("placeholder", val);
+  });
+
+  // RTL support for Arabic
+  document.documentElement.setAttribute("dir", currentLangCode === "ar" ? "rtl" : "ltr");
+  document.documentElement.setAttribute("lang", currentLangCode);
+
+  const note = document.getElementById("languageDetectNote");
+  note.textContent = languageIsAuto ? `Detected: ${currentLangCode}` : "";
+
+  // The subscribed banner (if visible) and currency-dependent headers
+  // both contain translated + dynamic content, so refresh them too.
+  updateHeaderText();
+  refreshCurrencyDisplay();
+}
+
+function setLanguage(code, userInitiated = false) {
+  if (code === "auto") {
+    languageIsAuto = true;
+    detectLanguageFromBrowser();
+    return;
+  }
+  languageIsAuto = false;
+  currentLangCode = code;
+  applyLanguage();
+}
+
+function detectLanguageFromBrowser() {
+  const browserLang = (navigator.language || "en").split("-")[0].toLowerCase();
+  currentLangCode = TRANSLATIONS[browserLang] ? browserLang : "en";
+  applyLanguage();
+}
+
+let rowCounter = 0;
+
+/* ---------------------------------------------------------------------
+   TRADE CONFIG
+   Each entry defines the branding (icon, label) and pre-filled sample
+   line items for a given trade. Add new trades here — everything else
+   (math, PDF layout, payments) works automatically for any trade added.
+--------------------------------------------------------------------- */
+const TRADES = {
+  plumber: {
+    label: "Plumber's Edition",
+    icon: "fa-wrench",
+    rows: [
+      { desc: "1.5-inch Copper Pipe (10ft)", qty: 2, price: 15.00 },
+      { desc: "PVC Schedule 40 Elbow (3/4 inch)", qty: 4, price: 3.50 },
+      { desc: "Labor (per hour)", qty: 2, price: 75.00 },
+    ],
+    commonItems: [
+      { name: "1.5-inch Copper Pipe (10ft)", price: 15.00 },
+      { name: "PVC Schedule 40 Elbow (3/4 inch)", price: 3.50 },
+      { name: "PVC Pipe (10ft)", price: 8.00 },
+      { name: "Ball Valve (1/2 inch)", price: 9.50 },
+      { name: "Water Heater Installation", price: 350.00 },
+      { name: "Faucet Replacement", price: 45.00 },
+      { name: "Drain Snaking / Unclogging", price: 90.00 },
+      { name: "Toilet Installation", price: 120.00 },
+      { name: "Pipe Fitting (assorted)", price: 5.50 },
+      { name: "Labor (per hour)", price: 75.00 },
+    ],
+  },
+  electrician: {
+    label: "Electrician's Edition",
+    icon: "fa-bolt",
+    rows: [
+      { desc: "12-Gauge Romex Wire (per ft)", qty: 50, price: 0.85 },
+      { desc: "Standard Outlet Installation", qty: 3, price: 25.00 },
+      { desc: "Labor (per hour)", qty: 2, price: 85.00 },
+    ],
+    commonItems: [
+      { name: "12-Gauge Romex Wire (per ft)", price: 0.85 },
+      { name: "14-Gauge Romex Wire (per ft)", price: 0.65 },
+      { name: "Standard Outlet Installation", price: 25.00 },
+      { name: "GFCI Outlet Installation", price: 35.00 },
+      { name: "Circuit Breaker (20A)", price: 18.00 },
+      { name: "Light Fixture Installation", price: 60.00 },
+      { name: "Panel Upgrade", price: 450.00 },
+      { name: "Ceiling Fan Installation", price: 85.00 },
+      { name: "Junction Box", price: 6.00 },
+      { name: "Labor (per hour)", price: 85.00 },
+    ],
+  },
+  hvac: {
+    label: "HVAC Edition",
+    icon: "fa-fan",
+    rows: [
+      { desc: "16x25x1 Furnace Filter", qty: 2, price: 12.00 },
+      { desc: "Refrigerant Recharge (per lb)", qty: 3, price: 45.00 },
+      { desc: "Labor (per hour)", qty: 2, price: 90.00 },
+    ],
+    commonItems: [
+      { name: "16x25x1 Furnace Filter", price: 12.00 },
+      { name: "Refrigerant Recharge (per lb)", price: 45.00 },
+      { name: "Thermostat Installation", price: 65.00 },
+      { name: "Duct Cleaning (per vent)", price: 30.00 },
+      { name: "AC Tune-Up / Inspection", price: 110.00 },
+      { name: "Capacitor Replacement", price: 40.00 },
+      { name: "Condenser Coil Cleaning", price: 85.00 },
+      { name: "Furnace Filter (per unit)", price: 12.00 },
+      { name: "Blower Motor Replacement", price: 220.00 },
+      { name: "Labor (per hour)", price: 90.00 },
+    ],
+  },
+  landscaper: {
+    label: "Landscaping Edition",
+    icon: "fa-leaf",
+    rows: [
+      { desc: "Hardwood Mulch (per yard)", qty: 3, price: 40.00 },
+      { desc: "Lawn Mowing (per visit)", qty: 1, price: 55.00 },
+      { desc: "Labor (per hour)", qty: 3, price: 45.00 },
+    ],
+    commonItems: [
+      { name: "Hardwood Mulch (per yard)", price: 40.00 },
+      { name: "Lawn Mowing (per visit)", price: 55.00 },
+      { name: "Tree Trimming (per tree)", price: 75.00 },
+      { name: "Tree Removal (per tree)", price: 300.00 },
+      { name: "Sod Installation (per sq ft)", price: 1.20 },
+      { name: "Irrigation System Repair", price: 95.00 },
+      { name: "Hedge Trimming (per hour)", price: 40.00 },
+      { name: "Leaf Removal (per visit)", price: 65.00 },
+      { name: "Fertilizer Application", price: 50.00 },
+      { name: "Labor (per hour)", price: 45.00 },
+    ],
+  },
+  handyman: {
+    label: "Handyman Edition",
+    icon: "fa-screwdriver-wrench",
+    rows: [
+      { desc: "Drywall Patch Kit", qty: 1, price: 18.00 },
+      { desc: "Interior Door Hardware Set", qty: 1, price: 22.00 },
+      { desc: "Labor (per hour)", qty: 3, price: 55.00 },
+    ],
+    commonItems: [
+      { name: "Drywall Patch Kit", price: 18.00 },
+      { name: "Interior Door Hardware Set", price: 22.00 },
+      { name: "Furniture Assembly (per item)", price: 40.00 },
+      { name: "Picture / TV Mounting", price: 45.00 },
+      { name: "Caulking (per tube)", price: 8.00 },
+      { name: "Weatherstripping (per door)", price: 15.00 },
+      { name: "Shelf Installation", price: 35.00 },
+      { name: "Minor Plumbing Fix", price: 50.00 },
+      { name: "Paint Touch-Up (per room)", price: 60.00 },
+      { name: "Labor (per hour)", price: 55.00 },
+    ],
+  },
+  cleaner: {
+    label: "Cleaning Edition",
+    icon: "fa-spray-can-sparkles",
+    rows: [
+      { desc: "Deep Clean (per room)", qty: 4, price: 35.00 },
+      { desc: "Window Cleaning (per pane)", qty: 8, price: 4.00 },
+      { desc: "Labor (per hour)", qty: 2, price: 40.00 },
+    ],
+    commonItems: [
+      { name: "Deep Clean (per room)", price: 35.00 },
+      { name: "Window Cleaning (per pane)", price: 4.00 },
+      { name: "Carpet Shampooing (per room)", price: 45.00 },
+      { name: "Kitchen Deep Clean", price: 60.00 },
+      { name: "Bathroom Deep Clean", price: 40.00 },
+      { name: "Move-Out Cleaning (flat)", price: 250.00 },
+      { name: "Oven Cleaning", price: 35.00 },
+      { name: "Cleaning Supplies (flat fee)", price: 15.00 },
+      { name: "Upholstery Cleaning (per piece)", price: 50.00 },
+      { name: "Labor (per hour)", price: 40.00 },
+    ],
+  },
+  general: {
+    label: "Contractor's Edition",
+    icon: "fa-helmet-safety",
+    rows: [
+      { desc: "Framing Lumber (2x4, 8ft)", qty: 10, price: 6.50 },
+      { desc: "Drywall Sheet (4x8ft)", qty: 6, price: 14.00 },
+      { desc: "Labor (per hour)", qty: 4, price: 65.00 },
+    ],
+    commonItems: [
+      { name: "Framing Lumber (2x4, 8ft)", price: 6.50 },
+      { name: "Drywall Sheet (4x8ft)", price: 14.00 },
+      { name: "Concrete (per bag)", price: 7.00 },
+      { name: "Roofing Shingles (per bundle)", price: 35.00 },
+      { name: "Insulation (per roll)", price: 45.00 },
+      { name: "Permit Filing Fee", price: 150.00 },
+      { name: "Dumpster Rental (flat)", price: 300.00 },
+      { name: "Site Cleanup", price: 120.00 },
+      { name: "Project Supervision (per day)", price: 200.00 },
+      { name: "Labor (per hour)", price: 65.00 },
+    ],
+  },
+};
+
+let currentTrade = "plumber";
+
+let headerTradeKey = null; // null = generic "all trades" header; set once user picks a trade
+
+function updateHeaderText() {
+  const iconEl = document.getElementById("tradeIcon");
+  const subtitleEl = document.getElementById("tradeSubtitle");
+
+  if (headerTradeKey && TRADES[headerTradeKey]) {
+    const trade = TRADES[headerTradeKey];
+    iconEl.className = `fa-solid ${trade.icon} me-2`;
+    subtitleEl.textContent = `· ${trade.label}`;
+    document.title = `Incubill · ${trade.label}`;
+  } else {
+    iconEl.className = "fa-solid fa-toolbox me-2";
+    subtitleEl.textContent = `· ${t("genericHeaderTagline")}`;
+    document.title = `Incubill · ${t("genericHeaderTagline")}`;
+  }
+}
+
+function applyTrade(tradeKey, isInitialLoad = false) {
+  const previousTrade = currentTrade;
+  const trade = TRADES[tradeKey];
+
+  // Only reset the job table to trade defaults on an explicit trade switch,
+  // not silently in the background, so we don't wipe in-progress work.
+  if (!isInitialLoad && !confirm(t("confirmTradeSwitch"))) {
+    document.getElementById("tradeSelect").value = previousTrade; // revert dropdown
+    return;
+  }
+
+  currentTrade = tradeKey;
+  refreshItemSuggestions();
+  // The header stays generic ("Incubill · All-Trades Edition") on the
+  // initial page load, and only switches to a trade-specific label once
+  // the person actually picks one from the dropdown themselves — this
+  // keeps first-time visitors from thinking the tool is plumbing-only.
+  if (!isInitialLoad) {
+    headerTradeKey = tradeKey;
+  }
+  updateHeaderText();
+
+  document.getElementById("jobTableBody").innerHTML = "";
+  trade.rows.forEach(r => addRow(r.desc, r.qty, r.price));
+  calculateTotals();
+}
+
+function init() {
+  document.getElementById("estimateDate").valueAsDate = new Date();
+  document.getElementById("estimateNumber").value = generateEstimateNumber();
+  detectLanguageFromBrowser();
+  applyTrade("plumber", true);
+  detectCurrencyByLocation();
+}
+
+function generateEstimateNumber() {
+  const num = Math.floor(1000 + Math.random() * 9000);
+  return `EST-${num}`;
+}
+
+// Escapes any text before it's inserted into innerHTML, so a description
+// (or any other dynamic value) containing quotes, angle brackets, etc.
+// can never break out of an attribute or inject a script tag. Defense in
+// depth: current call sites don't pass attacker-controlled text, but this
+// makes the whole pattern safe regardless of how the code evolves later.
+function escapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = String(str);
+  return div.innerHTML;
+}
+
+function addRow(desc = "", qty = 1, price = 0) {
+  rowCounter++;
+  const tbody = document.getElementById("jobTableBody");
+  const rowNum = tbody.children.length + 1;
+  const tr = document.createElement("tr");
+  tr.dataset.rowId = rowCounter;
+  tr.innerHTML = `
+    <td class="row-index">${rowNum}</td>
+    <td><input type="text" class="form-control desc-input" list="itemSuggestions" value="${escapeHtml(desc)}" aria-label="${escapeHtml(t("description"))} — ${escapeHtml(t("rowLabelPrefix"))} ${rowNum}" onchange="onDescriptionPick(this)"></td>
+    <td><input type="number" class="form-control qty-input" value="${Number(qty) || 0}" min="0" step="1" onchange="calculateTotals()" oninput="calculateTotals()" aria-label="${escapeHtml(t("quantity"))} — ${escapeHtml(t("rowLabelPrefix"))} ${rowNum}"></td>
+    <td><input type="number" class="form-control price-input" value="${price.toFixed ? price.toFixed(2) : Number(price) || 0}" min="0" step="0.01" onchange="calculateTotals()" oninput="calculateTotals()" aria-label="${escapeHtml(t("unitPriceHeader").replace(/\s*\(.*\)/, ""))} — ${escapeHtml(t("rowLabelPrefix"))} ${rowNum}"></td>
+    <td class="row-total fw-semibold">${formatMoney(0)}</td>
+    <td><button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteRow(this)" aria-label="${escapeHtml(t("deleteRowLabel"))} ${rowNum}"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></td>
+  `;
+  tbody.appendChild(tr);
+  calculateTotals();
+}
+
+// When someone picks (or types an exact match of) a common item from the
+// Description autocomplete list, auto-fill a suggested unit price. They
+// can still edit it freely afterward — this is just a starting point.
+function onDescriptionPick(inputEl) {
+  const items = (TRADES[currentTrade] && TRADES[currentTrade].commonItems) || [];
+  const match = items.find(item => item.name === inputEl.value);
+  if (match) {
+    const row = inputEl.closest("tr");
+    const priceInput = row.querySelector(".price-input");
+    priceInput.value = match.price.toFixed(2);
+  }
+  calculateTotals();
+}
+
+function refreshItemSuggestions() {
+  const datalist = document.getElementById("itemSuggestions");
+  const items = (TRADES[currentTrade] && TRADES[currentTrade].commonItems) || [];
+  datalist.innerHTML = items.map(item => `<option value="${escapeHtml(item.name)}"></option>`).join("");
+}
+
+function deleteRow(btn) {
+  const row = btn.closest("tr");
+  row.remove();
+  renumberRows();
+  calculateTotals();
+}
+
+function renumberRows() {
+  document.querySelectorAll("#jobTableBody tr").forEach((tr, i) => {
+    tr.querySelector(".row-index").textContent = i + 1;
+  });
+}
+
+function calculateTotals() {
+  let subtotal = 0;
+  document.querySelectorAll("#jobTableBody tr").forEach(tr => {
+    const qty = parseFloat(tr.querySelector(".qty-input").value) || 0;
+    const price = parseFloat(tr.querySelector(".price-input").value) || 0;
+    const total = qty * price;
+    tr.querySelector(".row-total").textContent = formatMoney(total);
+    subtotal += total;
+  });
+
+  const travelFeeChecked = document.getElementById("travelFee").checked;
+  const travelFeeAmount = parseFloat(document.getElementById("travelFeeAmount").value) || 0;
+  const travelFee = travelFeeChecked ? travelFeeAmount : 0;
+  const taxRate = parseFloat(document.getElementById("taxRate").value) || 0;
+  const taxAmount = subtotal * taxRate;
+  const grandTotal = subtotal + travelFee + taxAmount;
+
+  document.getElementById("subtotal").value = formatMoney(subtotal);
+  document.getElementById("taxAmount").value = formatMoney(taxAmount);
+  document.getElementById("grandTotal").textContent = formatMoney(grandTotal);
+}
+
+function resetForm() {
+  if (!confirm(t("confirmReset"))) return;
+  document.getElementById("clientName").value = "";
+  document.getElementById("clientEmail").value = "";
+  document.getElementById("clientAddress").value = "";
+  document.getElementById("estimateDate").valueAsDate = new Date();
+  document.getElementById("estimateNumber").value = generateEstimateNumber();
+  document.getElementById("travelFee").checked = false;
+  document.getElementById("travelFeeAmount").value = "30.00";
+  document.getElementById("taxRate").value = "0.08";
+  document.getElementById("jobTableBody").innerHTML = "";
+  TRADES[currentTrade].rows.forEach(r => addRow(r.desc, r.qty, r.price));
+  calculateTotals();
+}
+
+function getBusinessHeaderLine() {
+  const name = document.getElementById("businessName").value.trim();
+  const address = document.getElementById("businessAddress").value.trim();
+  const phone = document.getElementById("businessPhone").value.trim();
+  const gstin = document.getElementById("businessGstin").value.trim();
+  const parts = [name, address, phone].filter(Boolean);
+  if (gstin) parts.push(`${tPdf("gstinPrefix")} ${gstin}`);
+  // If the plumber hasn't filled in their real details yet, fall back to
+  // the translated placeholder so the PDF still looks complete.
+  return parts.length ? parts.join(" | ") : tPdf("companyPlaceholder");
+}
+
+// Live validation note under the payment-milestone % inputs — purely a
+// UI nicety, doesn't block PDF generation if it doesn't add to 100.
+function checkMilestoneTotal() {
+  const advance = parseFloat(document.getElementById("advancePct").value) || 0;
+  const interim = parseFloat(document.getElementById("interimPct").value) || 0;
+  const final = parseFloat(document.getElementById("finalPct").value) || 0;
+  const sum = advance + interim + final;
+  const note = document.getElementById("milestoneSumNote");
+  if (sum === 100) {
+    note.textContent = "";
+  } else {
+    note.style.color = "#c0392b";
+    note.textContent = `${t("milestoneSumWarning")} (${sum}%)`;
+  }
+}
+
+function buildEstimatePDF() {
+  const clientName = document.getElementById("clientName").value.trim();
+  if (!clientName) {
+    alert(t("alertClientNameRequired"));
+    document.getElementById("clientName").focus();
+    return null;
+  }
+
+  const clientEmail = document.getElementById("clientEmail").value.trim();
+  const clientAddress = document.getElementById("clientAddress").value.trim();
+  const estimateDate = document.getElementById("estimateDate").value;
+  const estimateNumber = document.getElementById("estimateNumber").value;
+  const travelFeeChecked = document.getElementById("travelFee").checked;
+  const travelFeeAmount = parseFloat(document.getElementById("travelFeeAmount").value) || 0;
+  const taxRateSelect = document.getElementById("taxRate");
+  const taxRatePercent = (parseFloat(taxRateSelect.value) * 100).toFixed(0);
+
+  // jsPDF's built-in fonts only render Latin characters, so currency
+  // *symbols* like ₹, د.إ, or ¥ can come out blank/garbled in the PDF.
+  // We use the currency code (e.g. "INR 1,234.00") in the PDF instead —
+  // it's unambiguous everywhere and always renders correctly.
+  const pdfMoney = (amount) => {
+    try {
+      return new Intl.NumberFormat(navigator.language || "en-US", {
+        style: "currency",
+        currency: currentCurrencyCode,
+        currencyDisplay: "code",
+      }).format(amount);
+    } catch (e) {
+      return `${currentCurrencyCode} ${amount.toFixed(2)}`;
+    }
+  };
+
+  const rows = [];
+  document.querySelectorAll("#jobTableBody tr").forEach(tr => {
+    const desc = tr.querySelector(".desc-input").value;
+    const qty = parseFloat(tr.querySelector(".qty-input").value) || 0;
+    const price = parseFloat(tr.querySelector(".price-input").value) || 0;
+    rows.push([qty, desc, pdfMoney(price), pdfMoney(qty * price)]);
+  });
+
+  let subtotal = 0;
+  document.querySelectorAll("#jobTableBody tr").forEach(tr => {
+    const qty = parseFloat(tr.querySelector(".qty-input").value) || 0;
+    const price = parseFloat(tr.querySelector(".price-input").value) || 0;
+    subtotal += qty * price;
+  });
+  const travelFee = travelFeeChecked ? travelFeeAmount : 0;
+  const taxRate = parseFloat(taxRateSelect.value) || 0;
+  const taxAmount = subtotal * taxRate;
+  const grandTotal = subtotal + travelFee + taxAmount;
+
+  const subtotalText = pdfMoney(subtotal);
+  const taxAmountText = pdfMoney(taxAmount);
+  const grandTotalText = pdfMoney(grandTotal);
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  // Outer border
+  doc.setDrawColor(26, 42, 74);
+  doc.setLineWidth(0.5);
+  doc.rect(8, 8, 194, 281);
+
+  // Header
+  doc.setFontSize(20);
+  doc.setFont(undefined, "bold");
+  doc.text(tPdf("title"), 105, 22, { align: "center" });
+
+  // Company placeholder, top right
+  doc.setFontSize(9);
+  doc.setFont(undefined, "normal");
+  doc.text(getBusinessHeaderLine(), 194, 16, { align: "right" });
+
+  // Client details
+  doc.setFontSize(11);
+  let y = 40;
+  doc.setFont(undefined, "bold");
+  doc.text(tPdf("billTo"), 14, y);
+  doc.setFont(undefined, "normal");
+  doc.text(clientName, 14, y + 6);
+  if (clientEmail) doc.text(clientEmail, 14, y + 12);
+  if (clientAddress) doc.text(clientAddress, 14, y + 18);
+
+  doc.setFont(undefined, "bold");
+  doc.text(tPdf("estimateDate"), 138, y);
+  doc.setFont(undefined, "normal");
+  doc.text(estimateDate || "-", 176, y);
+
+  doc.setFont(undefined, "bold");
+  doc.text(tPdf("estimateNumber"), 138, y + 6);
+  doc.setFont(undefined, "normal");
+  doc.text(estimateNumber, 176, y + 6);
+
+  // Itemized table
+  doc.autoTable({
+    startY: y + 28,
+    head: [[tPdf("qty"), tPdf("description"), tPdf("unitPrice"), tPdf("total")]],
+    body: rows,
+    theme: "grid",
+    headStyles: { fillColor: [26, 42, 74] },
+    margin: { left: 14, right: 14 },
+  });
+
+  let finalY = doc.lastAutoTable.finalY + 10;
+
+  // Labels start further left and amounts sit closer to the page edge —
+  // this gives enough width for longer translated labels (e.g. "Total
+  // Général :", "Gesamtsumme:") without the label text running into the
+  // right-aligned amount, which is what caused the overlap before.
+  const totalsLabelX = 108;
+  const totalsAmountX = 196;
+
+  doc.setFontSize(11);
+  doc.setFont(undefined, "normal");
+  doc.text(tPdf("subtotal"), totalsLabelX, finalY);
+  doc.text(subtotalText, totalsAmountX, finalY, { align: "right" });
+  finalY += 7;
+
+  if (travelFeeChecked) {
+    doc.text(tPdf("travelFee"), totalsLabelX, finalY);
+    doc.text(pdfMoney(travelFeeAmount), totalsAmountX, finalY, { align: "right" });
+    finalY += 7;
+  }
+
+  doc.text(`${tPdf("tax")} (${taxRatePercent}%):`, totalsLabelX, finalY);
+  doc.text(taxAmountText, totalsAmountX, finalY, { align: "right" });
+  finalY += 10;
+
+  doc.setFont(undefined, "bold");
+  doc.setFontSize(13);
+  doc.text(tPdf("grandTotal"), totalsLabelX, finalY);
+  doc.text(grandTotalText, totalsAmountX, finalY, { align: "right" });
+
+  finalY += 16;
+  doc.setFont(undefined, "italic");
+  doc.setFontSize(9);
+  doc.text(tPdf("terms"), 14, finalY);
+
+  doc.setFont(undefined, "normal");
+  doc.setFontSize(10);
+  doc.text(tPdf("footer"), 105, 282, { align: "center" });
+
+  // -------------------------------------------------------------------
+  // PAGE 2 — Terms & Conditions (validity, payment milestones, scope of
+  // work / materials, exclusions). Kept on its own page so page 1 stays
+  // a clean itemized total, and so this section never gets squeezed or
+  // overlapped by a long item list.
+  // -------------------------------------------------------------------
+  const validityDaysVal = document.getElementById("validityDays").value;
+  const advancePctVal = parseFloat(document.getElementById("advancePct").value) || 0;
+  const interimPctVal = parseFloat(document.getElementById("interimPct").value) || 0;
+  const finalPctVal = parseFloat(document.getElementById("finalPct").value) || 0;
+  const scopeText = document.getElementById("scopeOfWork").value.trim();
+  const exclusionsText = document.getElementById("exclusions").value.trim();
+
+  doc.addPage();
+  doc.setDrawColor(26, 42, 74);
+  doc.setLineWidth(0.5);
+  doc.rect(8, 8, 194, 281);
+
+  const contentWidth = 172; // 194 - 14 (left margin) - 8 (right margin)
+  let ty = 24;
+
+  doc.setFont(undefined, "bold");
+  doc.setFontSize(16);
+  doc.text(tPdf("termsHeading"), 105, ty, { align: "center" });
+  ty += 6;
+  doc.setFont(undefined, "normal");
+  doc.setFontSize(9);
+  doc.text(`${estimateNumber} — ${clientName}`, 105, ty, { align: "center" });
+  ty += 14;
+
+  // Validity
+  doc.setFont(undefined, "bold");
+  doc.setFontSize(11);
+  doc.text(tPdf("validityHeading"), 14, ty);
+  ty += 6;
+  doc.setFont(undefined, "normal");
+  doc.setFontSize(10);
+  const validityLine = tPdf("validityText").replace("{days}", validityDaysVal);
+  doc.text(doc.splitTextToSize(validityLine, contentWidth), 14, ty);
+  ty += 14;
+
+  // Payment milestones
+  doc.setFont(undefined, "bold");
+  doc.setFontSize(11);
+  doc.text(tPdf("paymentMilestonesHeading"), 14, ty);
+  ty += 7;
+  doc.setFont(undefined, "normal");
+  doc.setFontSize(10);
+  const milestoneRows = [
+    [tPdf("advance"), `${advancePctVal}%`],
+    [tPdf("interim"), `${interimPctVal}%`],
+    [tPdf("finalBalance"), `${finalPctVal}%`],
+  ];
+  milestoneRows.forEach(([label, pct]) => {
+    doc.text(`•  ${label}`, 18, ty);
+    doc.text(pct, 186, ty, { align: "right" });
+    ty += 6;
+  });
+  ty += 8;
+
+  // Scope of work / materials
+  doc.setFont(undefined, "bold");
+  doc.setFontSize(11);
+  doc.text(tPdf("scopeHeading"), 14, ty);
+  ty += 6;
+  doc.setFont(undefined, "normal");
+  doc.setFontSize(10);
+  const scopeLines = doc.splitTextToSize(scopeText || tPdf("scopeDefault"), contentWidth);
+  doc.text(scopeLines, 14, ty);
+  ty += scopeLines.length * 5 + 10;
+
+  // Exclusions
+  doc.setFont(undefined, "bold");
+  doc.setFontSize(11);
+  doc.text(tPdf("exclusionsHeading"), 14, ty);
+  ty += 6;
+  doc.setFont(undefined, "normal");
+  doc.setFontSize(10);
+  const exclusionsLines = doc.splitTextToSize(exclusionsText || tPdf("exclusionsDefault"), contentWidth);
+  doc.text(exclusionsLines, 14, ty);
+  ty += exclusionsLines.length * 5 + 10;
+
+  // Signature lines
+  ty = Math.max(ty, 250);
+  doc.setDrawColor(150, 150, 150);
+  doc.setLineWidth(0.2);
+  doc.line(14, ty, 90, ty);
+  doc.line(120, ty, 196, ty);
+  doc.setFontSize(9);
+  doc.text(tPdf("contractorSignature"), 14, ty + 5);
+  doc.text(tPdf("clientSignature"), 120, ty + 5);
+
+  const filename = `${estimateNumber}_${clientName.replace(/\s+/g, "_")}.pdf`;
+  const summaryText =
+    `${tPdf("title")} ${estimateNumber}\n` +
+    `${t("clientName")}: ${clientName}\n` +
+    `${t("grandTotalLabel")}: ${grandTotalText}`;
+
+  return { doc, filename, summaryText, clientEmail, estimateNumber, grandTotalText };
+}
+
+function generatePDF() {
+  const result = buildEstimatePDF();
+  if (!result) return;
+  result.doc.save(result.filename);
+}
+
+/* ---------------------------------------------------------------------
+   SHARING
+   - shareEstimate(): uses the native Web Share API (navigator.share)
+     with the actual PDF file attached, when the browser/device supports
+     it — this is what shows the phone's normal share sheet (WhatsApp,
+     Email, Messages, AirDrop, etc.) with the file already attached.
+     Supported on most mobile browsers; not supported on most desktop
+     browsers, which is a platform limitation, not something this code
+     can work around.
+   - shareViaWhatsApp() / shareViaEmail(): universal fallback that works
+     everywhere. Browsers can't attach a file to a WhatsApp or mailto
+     link directly (no API allows it), so these download the PDF first
+     and then open WhatsApp/Email with the estimate summary pre-filled
+     — the plumber just attaches the already-downloaded file.
+--------------------------------------------------------------------- */
+async function shareEstimate() {
+  const result = buildEstimatePDF();
+  if (!result) return;
+
+  try {
+    const blob = result.doc.output("blob");
+    const file = new File([blob], result.filename, { type: "application/pdf" });
+
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({
+        files: [file],
+        title: result.filename,
+        text: result.summaryText,
+      });
+      return;
+    }
+  } catch (e) {
+    // If the user cancels the native share sheet, do nothing further.
+    if (e && e.name === "AbortError") return;
+  }
+
+  // Fallback for browsers without file-sharing support (most desktops):
+  // download the PDF and let the plumber attach it manually.
+  result.doc.save(result.filename);
+  alert(t("shareFallbackNote"));
+}
+
+function shareViaWhatsApp() {
+  const result = buildEstimatePDF();
+  if (!result) return;
+  result.doc.save(result.filename);
+  const text = encodeURIComponent(result.summaryText + "\n\n" + t("shareAttachNote"));
+  window.open(`https://wa.me/?text=${text}`, "_blank");
+}
+
+function shareViaEmail() {
+  const result = buildEstimatePDF();
+  if (!result) return;
+  result.doc.save(result.filename);
+  const subject = encodeURIComponent(`${tPdf("title")} ${result.estimateNumber}`);
+  const body = encodeURIComponent(result.summaryText + "\n\n" + t("shareAttachNote"));
+  const to = result.clientEmail || "";
+  window.location.href = `mailto:${to}?subject=${subject}&body=${body}`;
+}
+
+window.onload = init;
+</script>
+
+</body>
+</html>
