@@ -197,7 +197,7 @@ def signup():
             return render_template("signup.html")
 
         user = User(email=email)
-        user.set_password(password)
+        user.password_hash = generate_password_hash(password)
         db.session.add(user)
         db.session.commit()
 
