@@ -244,6 +244,66 @@ def logout():
     logout_user()
     return redirect(url_for("login"))
 
+    # ---------------------------------------------------------------------
+# Forgot Password
+# ---------------------------------------------------------------------
+@app.route("/forgot-password", methods=["GET", "POST"])
+@limiter.limit("5 per hour")
+def forgot_password():
+
+    if request.method == "POST":
+
+        email = request.form.get("email", "").strip().lower()
+
+        # Always show the same message to avoid revealing
+        # whether an email exists.
+        success_message = (
+            "If an account exists for that email, "
+            "a password reset link has been sent."
+        )
+
+        user = User.query.filter_by(email=email).first()
+
+        if user:
+
+            token = generate_reset_token(user.email)
+
+            reset_url = url_for(
+                "reset_password",
+                token=token,
+                _external=True
+            )
+
+            msg = Message(
+                "Reset your Incubill password",
+                recipients=[user.email]
+            )
+
+            msg.body = f"""
+Hello,
+
+Someone requested a password reset for your Incubill account.
+
+Click the link below to reset your password:
+
+{reset_url}
+
+This link expires in 1 hour.
+
+If you didn't request this, you can safely ignore this email.
+"""
+
+            try:
+                mail.send(msg)
+            except Exception as e:
+                app.logger.error(e)
+
+        flash(success_message, "success")
+
+        return redirect(url_for("login"))
+
+    return render_template("forgot_password.html")
+
 
 # ---------------------------------------------------------------------
 # Subscription gating
