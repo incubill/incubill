@@ -306,6 +306,51 @@ If you didn't request this, you can safely ignore this email.
 
 
 # ---------------------------------------------------------------------
+# Reset Password
+# ---------------------------------------------------------------------
+@app.route("/reset-password/<token>", methods=["GET", "POST"])
+def reset_password(token):
+
+    email = verify_reset_token(token)
+
+    if not email:
+        flash("This password reset link is invalid or has expired.", "error")
+        return redirect(url_for("forgot_password"))
+
+    user = User.query.filter_by(email=email).first()
+
+    if not user:
+        flash("User not found.", "error")
+        return redirect(url_for("forgot_password"))
+
+    if request.method == "POST":
+
+        password = request.form.get("password", "")
+        confirm_password = request.form.get("confirm_password", "")
+
+        if password != confirm_password:
+            flash("Passwords do not match.", "error")
+            return render_template("reset_password.html")
+
+        if len(password) < 8:
+            flash("Password must be at least 8 characters.", "error")
+            return render_template("reset_password.html")
+
+        user.set_password(password)
+
+        db.session.commit()
+
+        flash(
+            "Your password has been reset successfully. Please log in.",
+            "success"
+        )
+
+        return redirect(url_for("login"))
+
+    return render_template("reset_password.html")
+
+
+# ---------------------------------------------------------------------
 # Subscription gating
 # ---------------------------------------------------------------------
 def subscription_required(view_func):
