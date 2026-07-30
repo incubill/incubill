@@ -122,6 +122,21 @@ def load_user(user_id):
 
 
 # ---------------------------------------------------------------------
+# Auto-create tables on startup.
+#
+# Render's free instance type has no Shell access, so `flask --app app
+# init-db` can't be run manually there. db.create_all() only creates
+# tables that don't already exist (safe to run on every boot/redeploy)
+# and gunicorn imports this module once per worker, so this runs
+# automatically whenever the app starts — no manual step needed.
+# The `init-db` CLI command below still works too, for local dev or on
+# a paid Render instance with Shell access.
+# ---------------------------------------------------------------------
+with app.app_context():
+    db.create_all()
+
+
+# ---------------------------------------------------------------------
 # Auth routes
 # ---------------------------------------------------------------------
 @app.route("/signup", methods=["GET", "POST"])
