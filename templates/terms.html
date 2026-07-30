@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Terms of Service · Incubill{% endblock %}
+{% block content %}
+<div class="auth-card" style="max-width:720px;">
+  <h1>Terms and Conditions for Incubill Service Providers &amp; Clients</h1>
+  <p class="text-muted">Last Updated: July 18, 2026</p>
+
+  <h2 class="h5 mt-4">1. Introduction</h2>
+  <p>Welcome to Incubill ("Company," "we," "our," "us"). These Terms and Conditions ("Terms") govern your use of our platform and the services provided by our listed professionals, including but not limited to Plumbers, Electricians, HVAC Technicians, Landscapers, Handymen, Cleaning Services, and General Contractors (each a "Service Provider," collectively "Service Providers"). By booking a service, you ("Client") agree to be bound by these Terms.</p>
+
+  <h2 class="h5 mt-4">2. Services and Booking</h2>
+  <p><strong>Service Listings:</strong> Incubill provides a platform to connect Clients with independent Service Providers. We do not perform the services ourselves.</p>
+  <p><strong>Booking:</strong> A booking is confirmed only upon receipt of a confirmation email or notification from Incubill.</p>
+  <p><strong>Scope of Work:</strong> The Client agrees to clearly define the scope of work at the time of booking. Any changes or additional work requested on-site must be communicated and approved in writing, which may result in additional charges.</p>
+
+  <h2 class="h5 mt-4">3. Client Obligations and Rules</h2>
+  <p><strong>Access:</strong> The Client must provide the Service Provider with safe and clear access to the work area at the scheduled time.</p>
+  <p><strong>Utilities:</strong> The Client is responsible for providing access to necessary utilities (water, electricity) required to complete the job.</p>
+  <p><strong>Permits:</strong> Unless otherwise agreed, the Client is responsible for obtaining any necessary permits or licenses required for the work (e.g., for General Contractors or major electrical/plumbing work).</p>
+  <p><strong>Pets and Children:</strong> The Client agrees to secure any pets and ensure children are supervised away from the work area for safety reasons.</p>
+
+  <h2 class="h5 mt-4">4. Service Provider Rules and Regulations</h2>
+  <p>Service Providers using the Incubill platform agree to the following:</p>
+  <p><strong>Licensing &amp; Insurance:</strong> All Service Providers must hold valid, current licenses and insurance as required by local, state, and federal laws. Proof must be provided upon request.</p>
+  <p><strong>Professional Conduct:</strong> Service Providers must act in a professional, courteous, and safe manner at all times. Harassment, discrimination, or unprofessional behavior will result in immediate deactivation.</p>
+  <p><strong>Workmanship:</strong> All work must be performed to a professional standard, following all applicable building codes and safety regulations.</p>
+  <p><strong>Use of Subcontractors:</strong> Service Providers may not subcontract booked jobs to third parties without prior written consent from Incubill and the Client.</p>
+  <p><strong>Conflict of Interest:</strong> Service Providers must not solicit Clients for off-platform services to bypass Incubill's booking system.</p>
+
+  <h2 class="h5 mt-4">5. Payments and Fees</h2>
+  <p><strong>Pricing:</strong> Prices listed on the platform are estimates. Final pricing may vary based on the actual time and materials required on-site.</p>
+  <p><strong>Payment:</strong> Payment is processed through Incubill's secure payment gateway. By booking, you authorize us to charge your provided payment method.</p>
+  <p><strong>Cancellations:</strong> Clients may cancel a booking free of charge up to 24 hours before the scheduled start time. Cancellations within 24 hours may be subject to a cancellation fee of up to 50% of the service cost.</p>
+  <p><strong>Refunds:</strong> Refunds will be issued at Incubill's discretion based on the resolution of any disputes between the Client and Service Provider.</p>
+
+  <h2 class="h5 mt-4">6. Liability and Indemnification</h2>
+  <p><strong>Disclaimer:</strong> Incubill acts as a mediator and is not responsible for the quality, safety, or legality of the services provided.</p>
+  <p><strong>Liability:</strong> Service Providers are solely liable for any damages or injuries caused by their work. The Client agrees not to hold Incubill liable for any disputes, claims, or damages arising from services performed.</p>
+  <p><strong>Indemnity:</strong> The Client agrees to indemnify and hold Incubill harmless from any claims, damages, or expenses arising from a breach of these Terms or the Client's use of the platform.</p>
+
+  <h2 class="h5 mt-4">7. Dispute Resolution</h2>
+  <p><strong>Resolution Process:</strong> Any disputes between the Client and Service Provider must first be attempted to be resolved directly between the parties.</p>
+  <p><strong>Incubill Mediation:</strong> If a resolution cannot be reached, Incubill may, at our discretion, assist in mediating the dispute.</p>
+  <p><strong>Governing Law:</strong> These Terms are governed by the laws of the jurisdiction in which Incubill operates.</p>
+
+  <h2 class="h5 mt-4">8. Limitation of Liability</h2>
+  <p>In no event shall Incubill be liable for any indirect, incidental, special, consequential, or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from your use of the platform or services.</p>
+
+  <h2 class="h5 mt-4">9. Changes to Terms</h2>
+  <p>We reserve the right to update these Terms at any time. We will notify you of any changes by posting the new Terms on this page. Your continued use of the platform after any changes constitutes your acceptance of the new Terms.</p>
+
+  <h2 class="h5 mt-4">10. Contact Us</h2>
+  <p>If you have any questions about these Terms, please contact us at: <a href="mailto:support@incubill.com">support@incubill.com</a></p>
+
+  <p class="mt-4"><a href="{{ url_for('login') }}">&larr; Back</a></p>
+</div>
+{% endblock %}
