@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Activating Subscription</title>
+</head>
+<body>
+
+<h2>Payment received.</h2>
+
+<p>Please wait while we activate your subscription...</p>
+
+<script>
+async function checkStatus() {
+
+    const response = await fetch("/subscription-status");
+    const data = await response.json();
+
+    if (data.active) {
+        window.location = "/app";
+    } else {
+        setTimeout(checkStatus, 2000);
+    }
+}
+
+checkStatus();
+</script>
+
+</body>
+</html>

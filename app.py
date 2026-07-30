@@ -65,6 +65,8 @@ from flask_limiter.util import get_remote_address
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
 from dodopayments import DodoPayments
+from flask_mail import Mail, Message
+from itsdangerous import URLSafeTimedSerializer
 
 load_dotenv()
 
@@ -73,9 +75,31 @@ app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "change-me-in-production
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///incubill.db")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
+# -------------------------------
+# Email Configuration
+# -------------------------------
+
+app.config["MAIL_SERVER"] = os.getenv("MAIL_SERVER")
+app.config["MAIL_PORT"] = int(os.getenv("MAIL_PORT", 587))
+app.config["MAIL_USE_TLS"] = os.getenv("MAIL_USE_TLS", "True") == "True"
+app.config["MAIL_USERNAME"] = os.getenv("MAIL_USERNAME")
+app.config["MAIL_PASSWORD"] = os.getenv("MAIL_PASSWORD")
+app.config["MAIL_DEFAULT_SENDER"] = os.getenv("MAIL_DEFAULT_SENDER")
+
+
 db = SQLAlchemy(app)
-csrf = CSRFProtect(app)  # protects all POST forms (login, signup) automatically
-limiter = Limiter(get_remote_address, app=app, default_limits=["200 per hour"])
+
+mail = Mail(app)
+
+serializer = URLSafeTimedSerializer(app.config["SECRET_KEY"])
+
+csrf = CSRFProtect(app)
+
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["200 per hour"]
+)
 
 login_manager = LoginManager(app)
 login_manager.login_view = "login"
@@ -114,6 +138,24 @@ class User(db.Model, UserMixin):
 
     def has_access(self):
         return self.subscription_status in ("trialing", "active")
+    # ---------------------------------------------------------------------
+# Password Reset Helpers
+# ---------------------------------------------------------------------
+
+def generate_reset_token(email):
+    return serializer.dumps(email, salt="password-reset")
+
+
+def verify_reset_token(token, expiration=3600):
+    try:
+        email = serializer.loads(
+            token,
+            salt="password-reset",
+            max_age=expiration
+        )
+        return email
+    except Exception:
+        return None
 
 
 @login_manager.user_loader
@@ -173,6 +215,17 @@ def login():
         password = request.form.get("password", "")
         user = User.query.filter_by(email=email).first()
 
+        app.logger.info(f"Event type: {event_type}")
+app.logger.info(f"Payload: {event}")
+
+app.logger.info(f"Customer ID: {customer_id}")
+app.logger.info(f"Subscription ID: {subscription_id}")
+
+if user:
+    app.logger.info(f"Found user: {user.email}")
+else:
+    app.logger.error("No matching user found")
+
         if user is None or not user.check_password(password):
             flash("Invalid email or password.", "error")
             return render_template("login.html")
@@ -222,8 +275,20 @@ def create_checkout(plan):
             product_cart=[{"product_id": product_id, "quantity": 1}],
             customer={"email": current_user.email},
             metadata={"user_id": str(current_user.id)},
-            return_url=f"{BASE_URL}/app",
-        )
+            @app.route("/payment-success")
+@login_required
+def payment_success():
+    return render_template("payment_success.html")
+
+
+@app.route("/subscription-status")
+@login_required
+def subscription_status():
+    return jsonify({
+        "active": current_user.has_access()
+    })
+
+
         return redirect(session.checkout_url)
     except Exception as exc:
         app.logger.error(f"Checkout session creation failed: {exc}")
@@ -266,52 +331,109 @@ def dodo_webhook():
     payload = request.get_data()
     headers = request.headers
 
-    # Verify the webhook signature before trusting anything in the payload.
-    # See the module docstring — confirm this against Dodo's current docs.
+    # Verify webhook signature
     try:
         from standardwebhooks.webhooks import Webhook
+
         wh = Webhook(DODO_WEBHOOK_SECRET)
         wh.verify(payload, {
             "webhook-id": headers.get("webhook-id", ""),
             "webhook-timestamp": headers.get("webhook-timestamp", ""),
             "webhook-signature": headers.get("webhook-signature", ""),
         })
+
     except Exception as exc:
-        app.logger.warning(f"Webhook signature verification failed: {exc}")
+        app.logger.error(f"Webhook signature verification failed: {exc}")
         return jsonify({"error": "invalid signature"}), 400
 
     event = request.get_json(silent=True) or {}
+
+    app.logger.info("========== DODO WEBHOOK ==========")
+    app.logger.info(event)
+
     event_type = event.get("type", "")
-    data = event.get("data", {})
-    metadata = data.get("metadata", {}) or {}
-    customer = data.get("customer", {}) or {}
+    data = event.get("data", {}) or {}
+
+    # Dodo may nest these differently depending on the event type
+    metadata = (
+        data.get("metadata")
+        or data.get("subscription", {}).get("metadata")
+        or {}
+    )
+
+    customer = (
+        data.get("customer")
+        or data.get("subscription", {}).get("customer")
+        or {}
+    )
+
+    app.logger.info(f"Event Type: {event_type}")
+    app.logger.info(f"Metadata: {metadata}")
+    app.logger.info(f"Customer: {customer}")
 
     user = None
-    if metadata.get("user_id"):
-        user = db.session.get(User, int(metadata["user_id"]))
-    if user is None and customer.get("email"):
-        user = User.query.filter_by(email=customer["email"].lower()).first()
+
+    # First preference: metadata user_id
+    user_id = metadata.get("user_id")
+
+    if user_id:
+        try:
+            user = db.session.get(User, int(user_id))
+        except Exception:
+            app.logger.exception("Invalid user_id in metadata")
+
+    # Second preference: email lookup
+    if user is None:
+        email = customer.get("email")
+
+        if email:
+            user = User.query.filter_by(
+                email=email.strip().lower()
+            ).first()
 
     if user is None:
-        app.logger.warning(f"Webhook for unknown user: {event_type}")
-        return jsonify({"status": "ignored, user not found"}), 200
+        app.logger.error("===== USER NOT FOUND =====")
+        app.logger.error(event)
+        return jsonify({
+            "status": "ignored",
+            "reason": "user_not_found"
+        }), 200
 
-    # Map Dodo's event types to our internal status. Confirm these exact
-    # event type strings against the current Dodo webhook docs — this is
-    # the part most likely to need adjusting as their API evolves.
-    if event_type in ("subscription.active", "subscription.renewed"):
+    app.logger.info(f"Matched user: {user.email}")
+
+    # Update subscription
+    if event_type in (
+        "subscription.active",
+        "subscription.updated",
+        "subscription.renewed",
+    ):
         user.subscription_status = "active"
-        user.subscription_id = data.get("subscription_id")
-        user.dodo_customer_id = customer.get("customer_id")
+
+        if data.get("subscription_id"):
+            user.subscription_id = data.get("subscription_id")
+
+        if customer.get("customer_id"):
+            user.dodo_customer_id = customer.get("customer_id")
+
     elif event_type == "subscription.trialing":
         user.subscription_status = "trialing"
-        user.subscription_id = data.get("subscription_id")
-    elif event_type in ("subscription.cancelled", "subscription.expired"):
+
+    elif event_type in (
+        "subscription.cancelled",
+        "subscription.expired",
+    ):
         user.subscription_status = "canceled"
+
     elif event_type == "payment.failed":
         user.subscription_status = "past_due"
 
     db.session.commit()
+
+    app.logger.info(
+        f"Subscription updated successfully for {user.email} "
+        f"-> {user.subscription_status}"
+    )
+
     return jsonify({"status": "processed"}), 200
 
 
