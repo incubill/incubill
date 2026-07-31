@@ -697,6 +697,20 @@ def health():
 
 
 # ---------------------------------------------------------------------
+# Legal Pages
+# ---------------------------------------------------------------------
+
+@app.route("/terms")
+def terms():
+    return render_template("terms.html")
+
+
+@app.route("/privacy")
+def privacy():
+    return render_template("privacy.html")
+
+
+# ---------------------------------------------------------------------
 # Error Pages
 # ---------------------------------------------------------------------
 
@@ -711,12 +725,16 @@ def server_error(error):
     return render_template("500.html"), 500
 
 
+@app.route("/")
+def index():
+    return redirect(url_for("login"))
+
+
 # ---------------------------------------------------------------------
 # Run Application
 # ---------------------------------------------------------------------
 
 if __name__ == "__main__":
-
     app.run(
         host="0.0.0.0",
         port=int(os.environ.get("PORT", 5000)),

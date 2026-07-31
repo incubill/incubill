@@ -1,23 +1,60 @@
 {% extends "base.html" %}
 {% block title %}Log In · Incubill{% endblock %}
+
 {% block content %}
 <div class="auth-card">
   <h1><i class="fa-solid fa-toolbox me-2"></i>Incubill</h1>
-  <p class="text-muted mb-4">Log in to your account</p>
+
+  <p class="text-muted mb-2">Log in to your account</p>
+
+  <div class="alert alert-success text-center py-2 mb-4" role="alert">
+    🎉 <strong>New here?</strong> Sign up today and enjoy a <strong>FREE 7-day trial</strong>. Cancel anytime.
+  </div>
+
   <form method="POST">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
     <div class="mb-3">
       <label class="form-label" for="email">Email</label>
-      <input type="email" class="form-control" id="email" name="email" required autofocus>
+      <input
+        type="email"
+        class="form-control"
+        id="email"
+        name="email"
+        required
+        autofocus
+      >
     </div>
+
     <div class="mb-3">
       <label class="form-label" for="password">Password</label>
-      <input type="password" class="form-control" id="password" name="password" required>
+      <input
+        type="password"
+        class="form-control"
+        id="password"
+        name="password"
+        required
+      >
     </div>
-    <button type="submit" class="btn btn-primary-navy w-100">Log In</button>
+
+    <div class="text-end mb-3">
+      <a href="{{ url_for('forgot_password') }}" class="small text-decoration-none">
+        Forgot Password?
+      </a>
+    </div>
+
+    <button type="submit" class="btn btn-primary-navy w-100">
+      Log In
+    </button>
   </form>
-  <p class="text-center text-muted mt-4 mb-0">
-    Don't have an account? <a href="{{ url_for('signup') }}">Sign up</a>
+
+  <hr class="my-4">
+
+  <p class="text-center text-muted mb-0">
+    Don't have an account?<br>
+    <a href="{{ url_for('signup') }}" class="fw-semibold">
+      Sign up now and start your FREE 7-day trial
+    </a>
   </p>
 </div>
 {% endblock %}
