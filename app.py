@@ -363,42 +363,61 @@ def subscription_required(view_func):
     return wrapped
 
 
-@app.route("/subscribe")
-@login_required
-def subscribe():
-    if current_user.has_access():
-        return redirect(url_for("app_home"))
-    return render_template("subscribe.html")
-
-
 @app.route("/create-checkout/<plan>")
 @login_required
 def create_checkout(plan):
-    product_id = DODO_PRODUCT_ID_YEARLY if plan == "yearly" else DODO_PRODUCT_ID_MONTHLY
+
+    product_id = (
+        DODO_PRODUCT_ID_YEARLY
+        if plan == "yearly"
+        else DODO_PRODUCT_ID_MONTHLY
+    )
+
     try:
         session = dodo_client.checkout_sessions.create(
-            product_cart=[{"product_id": product_id, "quantity": 1}],
-            customer={"email": current_user.email},
-            metadata={"user_id": str(current_user.id)},
-            @app.route("/payment-success")
+            product_cart=[
+                {
+                    "product_id": product_id,
+                    "quantity": 1
+                }
+            ],
+            customer={
+                "email": current_user.email
+            },
+            metadata={
+                "user_id": str(current_user.id)
+            },
+            return_url=url_for(
+                "payment_success",
+                _external=True
+            )
+        )
+
+        return redirect(session.checkout_url)
+
+    except Exception as exc:
+        app.logger.exception("Checkout session creation failed")
+
+        flash(
+            "Couldn't start checkout. Please try again.",
+            "error"
+        )
+
+        return redirect(url_for("subscribe"))
+
+        @app.route("/payment-success")
 @login_required
 def payment_success():
+
     return render_template("payment_success.html")
 
-
-@app.route("/subscription-status")
+    @app.route("/subscription-status")
 @login_required
 def subscription_status():
+
     return jsonify({
         "active": current_user.has_access()
     })
-
-
-        return redirect(session.checkout_url)
-    except Exception as exc:
-        app.logger.error(f"Checkout session creation failed: {exc}")
-        flash("Couldn't start checkout. Please try again in a moment.", "error")
-        return redirect(url_for("subscribe"))
 
 
 # ---------------------------------------------------------------------
