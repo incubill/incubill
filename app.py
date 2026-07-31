@@ -363,6 +363,14 @@ def subscription_required(view_func):
     return wrapped
 
 
+@app.route("/subscribe")
+@login_required
+def subscribe():
+    if current_user.has_access():
+        return redirect(url_for("app_home"))
+    return render_template("subscribe.html")
+
+
 @app.route("/create-checkout/<plan>")
 @login_required
 def create_checkout(plan):
@@ -374,76 +382,60 @@ def create_checkout(plan):
     )
 
     try:
+
         session = dodo_client.checkout_sessions.create(
+
             product_cart=[
                 {
                     "product_id": product_id,
                     "quantity": 1
                 }
             ],
+
             customer={
                 "email": current_user.email
             },
+
             metadata={
                 "user_id": str(current_user.id)
-            },
-            return_url=url_for(
-                "payment_success",
-                _external=True
-            )
+            }
+
         )
 
         return redirect(session.checkout_url)
 
-    except Exception as exc:
-        app.logger.exception("Checkout session creation failed")
+    except Exception as e:
+
+        app.logger.exception("Checkout Error")
 
         flash(
-            "Couldn't start checkout. Please try again.",
+            "Unable to start checkout.",
             "error"
         )
 
         return redirect(url_for("subscribe"))
 
-        @app.route("/payment-success")
+
+@app.route("/payment-success")
 @login_required
 def payment_success():
 
     return render_template("payment_success.html")
 
-    @app.route("/subscription-status")
+
+@app.route("/subscription-status")
 @login_required
 def subscription_status():
 
+    db.session.refresh(current_user)
+
     return jsonify({
-        "active": current_user.has_access()
+
+        "active": current_user.has_access(),
+
+        "status": current_user.subscription_status
+
     })
-
-
-# ---------------------------------------------------------------------
-# The actual tool — gated behind login + active/trialing subscription
-# ---------------------------------------------------------------------
-@app.route("/app")
-@subscription_required
-def app_home():
-    return render_template("app.html", user=current_user)
-
-
-@app.route("/terms")
-def terms():
-    return render_template("terms.html")
-
-
-@app.route("/privacy")
-def privacy():
-    return render_template("privacy.html")
-
-
-@app.route("/")
-def index():
-    if current_user.is_authenticated and current_user.has_access():
-        return redirect(url_for("app_home"))
-    return redirect(url_for("login"))
 
 
 # ---------------------------------------------------------------------
@@ -472,11 +464,19 @@ def dodo_webhook():
 
     event = request.get_json(silent=True) or {}
 
-    app.logger.info("========== DODO WEBHOOK ==========")
-    app.logger.info(event)
+app.logger.info("=" * 80)
+app.logger.info("DODO WEBHOOK RECEIVED")
+app.logger.info("=" * 80)
+app.logger.info(event)
 
-    event_type = event.get("type", "")
-    data = event.get("data", {}) or {}
+event_type = event.get("type", "")
+data = event.get("data", {}) or {}
+metadata = data.get("metadata", {}) or {}
+customer = data.get("customer", {}) or {}
+
+app.logger.info(f"Event Type: {event_type}")
+app.logger.info(f"Metadata: {metadata}")
+app.logger.info(f"Customer: {customer}")
 
     # Dodo may nest these differently depending on the event type
     metadata = (
@@ -527,17 +527,24 @@ def dodo_webhook():
 
     # Update subscription
     if event_type in (
-        "subscription.active",
-        "subscription.updated",
-        "subscription.renewed",
-    ):
-        user.subscription_status = "active"
+    "subscription.active",
+    "subscription.updated",
+    "subscription.renewed",
+    "payment.succeeded",
+):
+    user.subscription_status = "active"
 
-        if data.get("subscription_id"):
-            user.subscription_id = data.get("subscription_id")
+    user.subscription_id = (
+        data.get("subscription_id")
+        or data.get("subscription", {}).get("subscription_id")
+        or user.subscription_id
+    )
 
-        if customer.get("customer_id"):
-            user.dodo_customer_id = customer.get("customer_id")
+    user.dodo_customer_id = (
+        customer.get("customer_id")
+        or customer.get("id")
+        or user.dodo_customer_id
+    )
 
     elif event_type == "subscription.trialing":
         user.subscription_status = "trialing"
