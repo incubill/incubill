@@ -207,36 +207,6 @@ def signup():
     return render_template("signup.html")
 
 
-@app.route("/login", methods=["GET", "POST"])
-@limiter.limit("10 per minute")
-def login():
-    if request.method == "POST":
-        email = request.form.get("email", "").strip().lower()
-        password = request.form.get("password", "")
-        user = User.query.filter_by(email=email).first()
-
-        app.logger.info(f"Event type: {event_type}")
-app.logger.info(f"Payload: {event}")
-
-app.logger.info(f"Customer ID: {customer_id}")
-app.logger.info(f"Subscription ID: {subscription_id}")
-
-if user:
-    app.logger.info(f"Found user: {user.email}")
-else:
-    app.logger.error("No matching user found")
-
-        if user is None or not user.check_password(password):
-            flash("Invalid email or password.", "error")
-            return render_template("login.html")
-
-        login_user(user)
-        if user.has_access():
-            return redirect(url_for("app_home"))
-        return redirect(url_for("subscribe"))
-
-    return render_template("login.html")
-
 
 @app.route("/logout")
 @login_required
@@ -645,3 +615,72 @@ def dodo_webhook():
             "status": "processed"
         }
     ), 200
+
+    # ---------------------------------------------------------------------
+# CLI Helper
+# ---------------------------------------------------------------------
+
+@app.cli.command("create-admin")
+def create_admin():
+    """
+    Creates an admin user if one doesn't already exist.
+    """
+
+    email = input("Admin Email: ").strip().lower()
+    password = input("Password: ").strip()
+
+    existing = User.query.filter_by(email=email).first()
+
+    if existing:
+        print("User already exists.")
+        return
+
+    admin = User(email=email)
+    admin.set_password(password)
+
+    # If your User model has an is_admin field, uncomment this:
+    # admin.is_admin = True
+
+    db.session.add(admin)
+    db.session.commit()
+
+    print("Admin created successfully.")
+
+
+# ---------------------------------------------------------------------
+# Health Check
+# ---------------------------------------------------------------------
+
+@app.route("/health")
+def health():
+    return jsonify({
+        "status": "ok"
+    })
+
+
+# ---------------------------------------------------------------------
+# Error Pages
+# ---------------------------------------------------------------------
+
+@app.errorhandler(404)
+def page_not_found(error):
+    return render_template("404.html"), 404
+
+
+@app.errorhandler(500)
+def server_error(error):
+    db.session.rollback()
+    return render_template("500.html"), 500
+
+
+# ---------------------------------------------------------------------
+# Run Application
+# ---------------------------------------------------------------------
+
+if __name__ == "__main__":
+
+    app.run(
+        host="0.0.0.0",
+        port=int(os.environ.get("PORT", 5000)),
+        debug=True,
+    )
