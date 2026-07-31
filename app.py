@@ -353,33 +353,50 @@ def reset_password(token):
 # ---------------------------------------------------------------------
 # Subscription gating
 # ---------------------------------------------------------------------
+
 def subscription_required(view_func):
+
     @wraps(view_func)
     @login_required
+
     def wrapped(*args, **kwargs):
+
         if not current_user.has_access():
+
             return redirect(url_for("subscribe"))
+
         return view_func(*args, **kwargs)
+
     return wrapped
 
+
+# ---------------------------------------------------------------------
+# Subscribe
+# ---------------------------------------------------------------------
 
 @app.route("/subscribe")
 @login_required
 def subscribe():
+
     if current_user.has_access():
+
         return redirect(url_for("app_home"))
+
     return render_template("subscribe.html")
 
+
+# ---------------------------------------------------------------------
+# Create Checkout
+# ---------------------------------------------------------------------
 
 @app.route("/create-checkout/<plan>")
 @login_required
 def create_checkout(plan):
 
-    product_id = (
-        DODO_PRODUCT_ID_YEARLY
-        if plan == "yearly"
-        else DODO_PRODUCT_ID_MONTHLY
-    )
+    if plan == "yearly":
+        product_id = DODO_PRODUCT_ID_YEARLY
+    else:
+        product_id = DODO_PRODUCT_ID_MONTHLY
 
     try:
 
@@ -398,30 +415,57 @@ def create_checkout(plan):
 
             metadata={
                 "user_id": str(current_user.id)
-            }
+            },
 
+            return_url=f"{BASE_URL}/payment-success"
+
+        )
+
+        app.logger.info(
+            f"Checkout created for {current_user.email}"
+        )
+
+        app.logger.info(
+            session.checkout_url
         )
 
         return redirect(session.checkout_url)
 
-    except Exception as e:
+    except Exception as exc:
 
-        app.logger.exception("Checkout Error")
+        app.logger.exception(exc)
 
         flash(
-            "Unable to start checkout.",
+            "Unable to start checkout. Please try again.",
             "error"
         )
 
-        return redirect(url_for("subscribe"))
+        return redirect(
+            url_for("subscribe")
+        )
 
+
+# ---------------------------------------------------------------------
+# Payment Success
+# ---------------------------------------------------------------------
 
 @app.route("/payment-success")
 @login_required
 def payment_success():
 
-    return render_template("payment_success.html")
+    flash(
+        "Payment received. Your subscription will activate within a few seconds.",
+        "success"
+    )
 
+    return render_template(
+        "payment_success.html"
+    )
+
+
+# ---------------------------------------------------------------------
+# AJAX Subscription Status
+# ---------------------------------------------------------------------
 
 @app.route("/subscription-status")
 @login_required
@@ -437,48 +481,50 @@ def subscription_status():
 
     })
 
+# ---------------------------------------------------------------------
+# Dodo Webhook
+# ---------------------------------------------------------------------
 
-# ---------------------------------------------------------------------
-# Dodo webhook — this is what actually keeps subscription_status in sync
-# ---------------------------------------------------------------------
 @app.route("/webhook/dodo", methods=["POST"])
 @csrf.exempt
 def dodo_webhook():
+
     payload = request.get_data()
+
     headers = request.headers
 
-    # Verify webhook signature
     try:
+
         from standardwebhooks.webhooks import Webhook
 
         wh = Webhook(DODO_WEBHOOK_SECRET)
-        wh.verify(payload, {
-            "webhook-id": headers.get("webhook-id", ""),
-            "webhook-timestamp": headers.get("webhook-timestamp", ""),
-            "webhook-signature": headers.get("webhook-signature", ""),
-        })
+
+        wh.verify(
+            payload,
+            {
+                "webhook-id": headers.get("webhook-id", ""),
+                "webhook-timestamp": headers.get("webhook-timestamp", ""),
+                "webhook-signature": headers.get("webhook-signature", ""),
+            },
+        )
 
     except Exception as exc:
-        app.logger.error(f"Webhook signature verification failed: {exc}")
-        return jsonify({"error": "invalid signature"}), 400
+
+        app.logger.exception(exc)
+
+        return jsonify({"error": "Invalid webhook signature"}), 400
 
     event = request.get_json(silent=True) or {}
 
-app.logger.info("=" * 80)
-app.logger.info("DODO WEBHOOK RECEIVED")
-app.logger.info("=" * 80)
-app.logger.info(event)
+    app.logger.info("=" * 80)
+    app.logger.info("DODO WEBHOOK RECEIVED")
+    app.logger.info(event)
+    app.logger.info("=" * 80)
 
-event_type = event.get("type", "")
-data = event.get("data", {}) or {}
-metadata = data.get("metadata", {}) or {}
-customer = data.get("customer", {}) or {}
+    event_type = event.get("type", "")
 
-app.logger.info(f"Event Type: {event_type}")
-app.logger.info(f"Metadata: {metadata}")
-app.logger.info(f"Customer: {customer}")
+    data = event.get("data", {}) or {}
 
-    # Dodo may nest these differently depending on the event type
     metadata = (
         data.get("metadata")
         or data.get("subscription", {}).get("metadata")
@@ -497,85 +543,105 @@ app.logger.info(f"Customer: {customer}")
 
     user = None
 
-    # First preference: metadata user_id
-    user_id = metadata.get("user_id")
+    if metadata.get("user_id"):
 
-    if user_id:
         try:
-            user = db.session.get(User, int(user_id))
-        except Exception:
-            app.logger.exception("Invalid user_id in metadata")
 
-    # Second preference: email lookup
+            user = db.session.get(
+                User,
+                int(metadata["user_id"])
+            )
+
+        except Exception:
+
+            app.logger.exception(
+                "Invalid metadata user_id"
+            )
+
     if user is None:
+
         email = customer.get("email")
 
         if email:
+
             user = User.query.filter_by(
                 email=email.strip().lower()
             ).first()
 
     if user is None:
-        app.logger.error("===== USER NOT FOUND =====")
+
+        app.logger.error("USER NOT FOUND")
+
         app.logger.error(event)
-        return jsonify({
-            "status": "ignored",
-            "reason": "user_not_found"
-        }), 200
 
-    app.logger.info(f"Matched user: {user.email}")
+        return jsonify(
+            {
+                "status": "ignored",
+                "reason": "user_not_found",
+            }
+        ), 200
 
-    # Update subscription
     if event_type in (
-    "subscription.active",
-    "subscription.updated",
-    "subscription.renewed",
-    "payment.succeeded",
-):
-    user.subscription_status = "active"
 
-    user.subscription_id = (
-        data.get("subscription_id")
-        or data.get("subscription", {}).get("subscription_id")
-        or user.subscription_id
-    )
+        "subscription.active",
 
-    user.dodo_customer_id = (
-        customer.get("customer_id")
-        or customer.get("id")
-        or user.dodo_customer_id
-    )
+        "subscription.updated",
+
+        "subscription.renewed",
+
+        "payment.succeeded",
+
+    ):
+
+        user.subscription_status = "active"
+
+        user.subscription_id = (
+
+            data.get("subscription_id")
+
+            or data.get("subscription", {}).get("subscription_id")
+
+            or user.subscription_id
+
+        )
+
+        user.dodo_customer_id = (
+
+            customer.get("customer_id")
+
+            or customer.get("id")
+
+            or user.dodo_customer_id
+
+        )
 
     elif event_type == "subscription.trialing":
+
         user.subscription_status = "trialing"
 
     elif event_type in (
+
         "subscription.cancelled",
+
         "subscription.expired",
+
     ):
+
         user.subscription_status = "canceled"
 
     elif event_type == "payment.failed":
+
         user.subscription_status = "past_due"
 
     db.session.commit()
 
     app.logger.info(
-        f"Subscription updated successfully for {user.email} "
-        f"-> {user.subscription_status}"
+        f"Subscription updated successfully for "
+        f"{user.email} -> {user.subscription_status}"
     )
 
-    return jsonify({"status": "processed"}), 200
-
-
-# ---------------------------------------------------------------------
-# CLI helper: `flask --app app init-db`
-# ---------------------------------------------------------------------
-@app.cli.command("init-db")
-def init_db():
-    db.create_all()
-    print("Database tables created.")
-
-
-if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    return jsonify(
+        {
+            "status": "processed"
+        }
+    ), 200
