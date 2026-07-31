@@ -1,0 +1,326 @@
+{% extends "base.html" %}
+
+{% block title %}Incubill - Smart Billing for Small Businesses{% endblock %}
+
+{% block content %}
+
+<!-- Hero Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+
+        <div class="row align-items-center">
+
+            <div class="col-lg-6">
+
+                <h1 class="display-4 fw-bold">
+                    Create Professional Bills in Minutes
+                </h1>
+
+                <p class="lead text-muted mt-4">
+
+                    Incubill helps electricians, plumbers, contractors,
+                    freelancers and small businesses create beautiful invoices,
+                    manage customers and receive payments effortlessly.
+
+                </p>
+
+                <div class="mt-4">
+
+                    <a href="{{ url_for('signup') }}"
+                       class="btn btn-primary btn-lg me-3">
+
+                        Start Free 7-Day Trial
+
+                    </a>
+
+                    <a href="#video"
+                       class="btn btn-outline-dark btn-lg">
+
+                        ▶ Watch Demo
+
+                    </a>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-6 text-center">
+
+                <img
+                    src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=900"
+                    class="img-fluid rounded shadow"
+                    alt="Invoice Dashboard">
+
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+<!-- Features -->
+
+<section class="py-5">
+
+<div class="container">
+
+<h2 class="text-center mb-5">
+
+Everything You Need
+
+</h2>
+
+<div class="row g-4">
+
+<div class="col-md-4">
+
+<div class="card shadow border-0 h-100">
+
+<div class="card-body text-center">
+
+<h3>⚡</h3>
+
+<h5>Create Invoices</h5>
+
+<p>
+
+Generate professional invoices in less than a minute.
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-4">
+
+<div class="card shadow border-0 h-100">
+
+<div class="card-body text-center">
+
+<h3>👥</h3>
+
+<h5>Manage Customers</h5>
+
+<p>
+
+Store customer information securely and access it anytime.
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-4">
+
+<div class="card shadow border-0 h-100">
+
+<div class="card-body text-center">
+
+<h3>📄</h3>
+
+<h5>Download PDF</h5>
+
+<p>
+
+Create print-ready invoices instantly.
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- How It Works -->
+
+<section class="bg-light py-5">
+
+<div class="container">
+
+<h2 class="text-center mb-5">
+
+How Incubill Works
+
+</h2>
+
+<div class="row text-center">
+
+<div class="col-md-3">
+
+<h1>1️⃣</h1>
+
+<h5>Create Account</h5>
+
+</div>
+
+<div class="col-md-3">
+
+<h1>2️⃣</h1>
+
+<h5>Add Customer</h5>
+
+</div>
+
+<div class="col-md-3">
+
+<h1>3️⃣</h1>
+
+<h5>Create Invoice</h5>
+
+</div>
+
+<div class="col-md-3">
+
+<h1>4️⃣</h1>
+
+<h5>Download & Share</h5>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- Video -->
+
+<section id="video" class="py-5">
+
+<div class="container">
+
+<h2 class="text-center mb-5">
+
+Watch Demo
+
+</h2>
+
+<div class="ratio ratio-16x9">
+
+<iframe
+
+src="https://www.youtube.com/embed/YOUR_VIDEO_ID"
+
+title="Incubill Demo"
+
+allowfullscreen>
+
+</iframe>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- Pricing -->
+
+<section class="py-5 bg-light">
+
+<div class="container">
+
+<h2 class="text-center mb-5">
+
+Simple Pricing
+
+</h2>
+
+<div class="row">
+
+<div class="col-md-6">
+
+<div class="card shadow">
+
+<div class="card-body text-center">
+
+<h3>Monthly</h3>
+
+<h2>₹299/mo</h2>
+
+<a href="{{ url_for('signup') }}"
+class="btn btn-primary">
+
+Start Free Trial
+
+</a>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-6">
+
+<div class="card shadow">
+
+<div class="card-body text-center">
+
+<h3>Yearly</h3>
+
+<h2>₹2999/year</h2>
+
+<p>Save More</p>
+
+<a href="{{ url_for('signup') }}"
+class="btn btn-success">
+
+Choose Yearly
+
+</a>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- CTA -->
+
+<section class="py-5 text-center">
+
+<div class="container">
+
+<h2>
+
+Ready to Grow Your Business?
+
+</h2>
+
+<p class="lead">
+
+Start your FREE 7-Day Trial today.
+
+</p>
+
+<a href="{{ url_for('signup') }}"
+class="btn btn-primary btn-lg">
+
+Create Free Account
+
+</a>
+
+</div>
+
+</section>
+
+{% endblock %}

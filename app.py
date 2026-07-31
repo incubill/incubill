@@ -133,16 +133,61 @@ else:
 # ---------------------------------------------------------------------
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(255), unique=True, nullable=False, index=True)
-    password_hash = db.Column(db.String(255), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+
+    email = db.Column(
+        db.String(255),
+        unique=True,
+        nullable=False,
+        index=True
+    )
+
+    # NEW
+    phone = db.Column(
+        db.String(20),
+        unique=True,
+        nullable=False,
+        index=True
+    )
+
+    password_hash = db.Column(
+        db.String(255),
+        nullable=False
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        default=datetime.datetime.utcnow
+    )
+
+    # NEW
+    trial_used = db.Column(
+        db.Boolean,
+        default=False,
+        nullable=False
+    )
 
     # Subscription state, kept in sync by the Dodo webhook.
-    dodo_customer_id = db.Column(db.String(255), nullable=True)
-    subscription_id = db.Column(db.String(255), nullable=True)
-    subscription_status = db.Column(db.String(50), default="none")
-    # Expected values: "none", "trialing", "active", "past_due", "canceled"
-    plan = db.Column(db.String(20), nullable=True)  # "monthly" or "yearly"
+    dodo_customer_id = db.Column(
+        db.String(255),
+        nullable=True
+    )
+
+    subscription_id = db.Column(
+        db.String(255),
+        nullable=True
+    )
+
+    subscription_status = db.Column(
+        db.String(50),
+        default="none"
+    )
+    # Expected values:
+    # "none", "trialing", "active", "past_due", "canceled"
+
+    plan = db.Column(
+        db.String(20),
+        nullable=True
+    )  # "monthly" or "yearly"
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -195,32 +240,54 @@ with app.app_context():
 # ---------------------------------------------------------------------
 # Auth routes
 # ---------------------------------------------------------------------
+
 @app.route("/signup", methods=["GET", "POST"])
 @limiter.limit("10 per hour")
 def signup():
-    if request.method == "POST":
-        email = request.form.get("email", "").strip().lower()
-        password = request.form.get("password", "")
 
-        if not email or not password:
-            flash("Email and password are required.", "error")
+    if request.method == "POST":
+
+        email = request.form["email"].strip().lower()
+        phone = request.form["phone"].strip()
+        password = request.form["password"]
+
+        existing_phone = User.query.filter_by(phone=phone).first()
+
+        if existing_phone:
+            flash(
+                "This mobile number has already been used for a free trial.",
+                "error"
+            )
+            return render_template("signup.html")
+
+        if not email or not phone or not password:
+            flash("All fields are required.", "error")
             return render_template("signup.html")
 
         if User.query.filter_by(email=email).first():
             flash("An account with that email already exists.", "error")
             return render_template("signup.html")
 
-        user = User(email=email)
-        user.password_hash = generate_password_hash(password)
+        user = User(
+            email=email,
+            phone=phone,
+            trial_used=True
+        )
+
+        user.set_password(password)
 
         db.session.add(user)
         db.session.commit()
 
         login_user(user)
+
         return redirect(url_for("subscribe"))
 
     return render_template("signup.html")
 
+@app.route("/")
+def home():
+    return render_template("home.html")
 
 @app.route("/login", methods=["GET", "POST"])
 @limiter.limit("10 per minute")
