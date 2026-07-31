@@ -107,11 +107,25 @@ login_manager.login_view = "login"
 DODO_API_KEY = os.environ.get("DODO_API_KEY")
 DODO_ENVIRONMENT = os.environ.get("DODO_ENVIRONMENT", "test_mode")
 DODO_WEBHOOK_SECRET = os.environ.get("DODO_WEBHOOK_SECRET")
-DODO_PRODUCT_ID_MONTHLY = os.environ.get("DODO_PRODUCT_ID_MONTHLY", "pdt_0NixvmMnNF6ocQBAHH4t5")
-DODO_PRODUCT_ID_YEARLY = os.environ.get("DODO_PRODUCT_ID_YEARLY", "pdt_0Niznuz8H4ZBmVMPTpz3X")
+DODO_PRODUCT_ID_MONTHLY = os.environ.get(
+    "DODO_PRODUCT_ID_MONTHLY",
+    "pdt_0NixvmMnNF6ocQBAHH4t5",
+)
+DODO_PRODUCT_ID_YEARLY = os.environ.get(
+    "DODO_PRODUCT_ID_YEARLY",
+    "pdt_0Niznuz8H4ZBmVMPTpz3X",
+)
 BASE_URL = os.environ.get("BASE_URL", "http://localhost:5000")
 
-dodo_client = DodoPayments(bearer_token=DODO_API_KEY, environment=DODO_ENVIRONMENT)
+# Only create the client when an API key exists.
+dodo_client = None
+if DODO_API_KEY:
+    dodo_client = DodoPayments(
+        bearer_token=DODO_API_KEY,
+        environment=DODO_ENVIRONMENT,
+    )
+else:
+    app.logger.warning("DODO_API_KEY is not configured.")
 
 
 # ---------------------------------------------------------------------
@@ -198,6 +212,7 @@ def signup():
 
         user = User(email=email)
         user.password_hash = generate_password_hash(password)
+
         db.session.add(user)
         db.session.commit()
 
@@ -205,6 +220,29 @@ def signup():
         return redirect(url_for("subscribe"))
 
     return render_template("signup.html")
+
+
+@app.route("/login", methods=["GET", "POST"])
+@limiter.limit("10 per minute")
+def login():
+    if request.method == "POST":
+        email = request.form.get("email", "").strip().lower()
+        password = request.form.get("password", "")
+
+        user = User.query.filter_by(email=email).first()
+
+        if user is None or not user.check_password(password):
+            flash("Invalid email or password.", "error")
+            return render_template("login.html")
+
+        login_user(user)
+
+        if user.has_access():
+            return redirect(url_for("app_home"))
+
+        return redirect(url_for("subscribe"))
+
+    return render_template("login.html")
 
 
 
