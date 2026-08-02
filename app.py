@@ -74,6 +74,7 @@ app = Flask(__name__)
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "change-me-in-production")
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///incubill.db")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["UPLOAD_FOLDER"] = "static/uploads/logos"
 
 # -------------------------------
 # Email Configuration
@@ -197,6 +198,46 @@ class User(db.Model, UserMixin):
 
     def has_access(self):
         return self.subscription_status in ("trialing", "active")
+
+    class CompanyProfile(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        unique=True,
+        nullable=False
+    )
+
+    company_name = db.Column(db.String(200))
+    owner_name = db.Column(db.String(200))
+
+    email = db.Column(db.String(255))
+    phone = db.Column(db.String(20))
+
+    gst_number = db.Column(db.String(50))
+
+    address = db.Column(db.Text)
+
+    city = db.Column(db.String(100))
+    state = db.Column(db.String(100))
+    pincode = db.Column(db.String(20))
+
+    website = db.Column(db.String(255))
+
+    upi_id = db.Column(db.String(100))
+
+    bank_name = db.Column(db.String(150))
+    account_name = db.Column(db.String(150))
+    account_number = db.Column(db.String(100))
+    ifsc = db.Column(db.String(50))
+
+    logo = db.Column(db.String(255))
+
+    created_at = db.Column(
+        db.DateTime,
+        default=datetime.datetime.utcnow
+    )
     # ---------------------------------------------------------------------
 # Password Reset Helpers
 # ---------------------------------------------------------------------
@@ -793,6 +834,19 @@ def index():
 # ---------------------------------------------------------------------
 # Run Application
 # ---------------------------------------------------------------------
+@app.route("/company-profile")
+@login_required
+def company_profile():
+
+    profile = CompanyProfile.query.filter_by(
+        user_id=current_user.id
+    ).first()
+
+    return render_template(
+        "company_profile.html",
+        profile=profile
+    )
+
 
 if __name__ == "__main__":
     app.run(
@@ -800,3 +854,4 @@ if __name__ == "__main__":
         port=int(os.environ.get("PORT", 5000)),
         debug=True,
     )
+
