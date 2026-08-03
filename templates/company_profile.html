@@ -4,11 +4,119 @@
 
 {% block content %}
 
-<div class="container mt-5">
+<div class="container mt-4">
 
     <h2>Company Profile</h2>
 
-    <p>This page is working.</p>
+    <form method="POST" enctype="multipart/form-data">
+
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="mb-3">
+            <label>Company Name</label>
+            <input class="form-control" name="company_name"
+                   value="{{ profile.company_name if profile else '' }}">
+        </div>
+
+        <div class="mb-3">
+            <label>Owner Name</label>
+            <input class="form-control" name="owner_name"
+                   value="{{ profile.owner_name if profile else '' }}">
+        </div>
+
+        <div class="mb-3">
+            <label>Email</label>
+            <input class="form-control" name="email"
+                   value="{{ profile.email if profile else '' }}">
+        </div>
+
+        <div class="mb-3">
+            <label>Phone</label>
+            <input class="form-control" name="phone"
+                   value="{{ profile.phone if profile else '' }}">
+        </div>
+
+        <div class="mb-3">
+            <label>GST Number</label>
+            <input class="form-control" name="gst_number"
+                   value="{{ profile.gst_number if profile else '' }}">
+        </div>
+
+        <div class="mb-3">
+            <label>Address</label>
+            <textarea class="form-control" name="address">{{ profile.address if profile else '' }}</textarea>
+        </div>
+
+        <div class="row">
+
+            <div class="col-md-4">
+                <label>City</label>
+                <input class="form-control" name="city"
+                       value="{{ profile.city if profile else '' }}">
+            </div>
+
+            <div class="col-md-4">
+                <label>State</label>
+                <input class="form-control" name="state"
+                       value="{{ profile.state if profile else '' }}">
+            </div>
+
+            <div class="col-md-4">
+                <label>Pincode</label>
+                <input class="form-control" name="pincode"
+                       value="{{ profile.pincode if profile else '' }}">
+            </div>
+
+        </div>
+
+        <br>
+
+        <div class="mb-3">
+            <label>Website</label>
+            <input class="form-control" name="website"
+                   value="{{ profile.website if profile else '' }}">
+        </div>
+
+        <div class="mb-3">
+            <label>UPI ID</label>
+            <input class="form-control" name="upi_id"
+                   value="{{ profile.upi_id if profile else '' }}">
+        </div>
+
+        <div class="mb-3">
+            <label>Bank Name</label>
+            <input class="form-control" name="bank_name"
+                   value="{{ profile.bank_name if profile else '' }}">
+        </div>
+
+        <div class="mb-3">
+            <label>Account Name</label>
+            <input class="form-control" name="account_name"
+                   value="{{ profile.account_name if profile else '' }}">
+        </div>
+
+        <div class="mb-3">
+            <label>Account Number</label>
+            <input class="form-control" name="account_number"
+                   value="{{ profile.account_number if profile else '' }}">
+        </div>
+
+        <div class="mb-3">
+            <label>IFSC</label>
+            <input class="form-control" name="ifsc"
+                   value="{{ profile.ifsc if profile else '' }}">
+        </div>
+
+        <div class="mb-3">
+            <label>Company Logo</label>
+            <input type="file" class="form-control" name="logo">
+        </div>
+
+        <button class="btn btn-primary">
+            Save Profile
+        </button>
+
+    </form>
 
 </div>
 

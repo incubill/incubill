@@ -834,13 +834,48 @@ def index():
 # ---------------------------------------------------------------------
 # Run Application
 # ---------------------------------------------------------------------
-@app.route("/company-profile")
+@app.route("/company-profile", methods=["GET", "POST"])
 @login_required
 def company_profile():
 
     profile = CompanyProfile.query.filter_by(
         user_id=current_user.id
     ).first()
+
+    if not profile:
+        profile = CompanyProfile(user_id=current_user.id)
+        db.session.add(profile)
+
+    if request.method == "POST":
+
+        profile.company_name = request.form.get("company_name")
+        profile.owner_name = request.form.get("owner_name")
+
+        profile.email = request.form.get("email")
+        profile.phone = request.form.get("phone")
+
+        profile.gst_number = request.form.get("gst_number")
+
+        profile.address = request.form.get("address")
+
+        profile.city = request.form.get("city")
+        profile.state = request.form.get("state")
+        profile.pincode = request.form.get("pincode")
+
+        profile.website = request.form.get("website")
+
+        profile.upi_id = request.form.get("upi_id")
+
+        profile.bank_name = request.form.get("bank_name")
+        profile.account_name = request.form.get("account_name")
+        profile.account_number = request.form.get("account_number")
+        profile.ifsc = request.form.get("ifsc")
+
+        db.session.commit()
+
+        flash("Company profile saved successfully.", "success")
+
+        return redirect(url_for("company_profile"))
 
     return render_template(
         "company_profile.html",
