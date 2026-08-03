@@ -155,6 +155,42 @@ class User(db.Model, UserMixin):
         nullable=False
     )
 
+    class CompanyProfile(db.Model):
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        unique=True,
+        nullable=False
+    )
+
+    company_name = db.Column(db.String(200))
+    owner_name = db.Column(db.String(200))
+
+    email = db.Column(db.String(255))
+    phone = db.Column(db.String(20))
+
+    gst_number = db.Column(db.String(50))
+
+    address = db.Column(db.Text)
+
+    city = db.Column(db.String(100))
+    state = db.Column(db.String(100))
+    pincode = db.Column(db.String(20))
+
+    website = db.Column(db.String(255))
+
+    upi_id = db.Column(db.String(100))
+
+    bank_name = db.Column(db.String(150))
+    account_name = db.Column(db.String(150))
+    account_number = db.Column(db.String(100))
+    ifsc = db.Column(db.String(50))
+
+    logo = db.Column(db.String(255))
+
     created_at = db.Column(
         db.DateTime,
         default=datetime.datetime.utcnow
@@ -200,6 +236,7 @@ class User(db.Model, UserMixin):
         return self.subscription_status in ("trialing", "active")
 
     class CompanyProfile(db.Model):
+
     id = db.Column(db.Integer, primary_key=True)
 
     user_id = db.Column(
