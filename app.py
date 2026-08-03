@@ -132,6 +132,7 @@ else:
 # ---------------------------------------------------------------------
 # Models
 # ---------------------------------------------------------------------
+
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
 
@@ -142,7 +143,6 @@ class User(db.Model, UserMixin):
         index=True
     )
 
-    # NEW
     phone = db.Column(
         db.String(20),
         unique=True,
@@ -155,55 +155,17 @@ class User(db.Model, UserMixin):
         nullable=False
     )
 
-    class CompanyProfile(db.Model):
-
-    id = db.Column(db.Integer, primary_key=True)
-
-    user_id = db.Column(
-        db.Integer,
-        db.ForeignKey("user.id"),
-        unique=True,
-        nullable=False
-    )
-
-    company_name = db.Column(db.String(200))
-    owner_name = db.Column(db.String(200))
-
-    email = db.Column(db.String(255))
-    phone = db.Column(db.String(20))
-
-    gst_number = db.Column(db.String(50))
-
-    address = db.Column(db.Text)
-
-    city = db.Column(db.String(100))
-    state = db.Column(db.String(100))
-    pincode = db.Column(db.String(20))
-
-    website = db.Column(db.String(255))
-
-    upi_id = db.Column(db.String(100))
-
-    bank_name = db.Column(db.String(150))
-    account_name = db.Column(db.String(150))
-    account_number = db.Column(db.String(100))
-    ifsc = db.Column(db.String(50))
-
-    logo = db.Column(db.String(255))
-
     created_at = db.Column(
         db.DateTime,
         default=datetime.datetime.utcnow
     )
 
-    # NEW
     trial_used = db.Column(
         db.Boolean,
         default=False,
         nullable=False
     )
 
-    # Subscription state, kept in sync by the Dodo webhook.
     dodo_customer_id = db.Column(
         db.String(255),
         nullable=True
@@ -218,13 +180,11 @@ class User(db.Model, UserMixin):
         db.String(50),
         default="none"
     )
-    # Expected values:
-    # "none", "trialing", "active", "past_due", "canceled"
 
     plan = db.Column(
         db.String(20),
         nullable=True
-    )  # "monthly" or "yearly"
+    )
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -235,8 +195,8 @@ class User(db.Model, UserMixin):
     def has_access(self):
         return self.subscription_status in ("trialing", "active")
 
-    class CompanyProfile(db.Model):
 
+class CompanyProfile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     user_id = db.Column(
@@ -275,6 +235,9 @@ class User(db.Model, UserMixin):
         db.DateTime,
         default=datetime.datetime.utcnow
     )
+
+
+
     # ---------------------------------------------------------------------
 # Password Reset Helpers
 # ---------------------------------------------------------------------
