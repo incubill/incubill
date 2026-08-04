@@ -884,6 +884,11 @@ def company_profile():
         profile=profile
     )
 
+@app.route("/routes")
+def routes():
+    return "<br>".join(
+        sorted(str(rule) for rule in app.url_map.iter_rules())
+    )
 
 if __name__ == "__main__":
     app.run(
