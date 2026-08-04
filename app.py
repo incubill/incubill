@@ -49,6 +49,7 @@ change, and a mismatch here would either reject legitimate webhooks or
 going to production with real payments.
 """
 
+from werkzeug.utils import secure_filename
 import os
 import datetime
 from functools import wraps
@@ -71,10 +72,11 @@ from itsdangerous import URLSafeTimedSerializer
 load_dotenv()
 
 app = Flask(__name__)
+app.config["UPLOAD_FOLDER"] = "static/uploads/logos"
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "change-me-in-production")
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///incubill.db")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config["UPLOAD_FOLDER"] = "static/uploads/logos"
+
 
 # -------------------------------
 # Email Configuration

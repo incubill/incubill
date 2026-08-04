@@ -110,6 +110,18 @@
         <div class="mb-3">
             <label>Company Logo</label>
             <input type="file" class="form-control" name="logo">
+
+            {% if profile and profile.logo %}
+
+<br>
+
+<img
+    src="{{ url_for('static',
+        filename='uploads/logos/' + profile.logo) }}"
+    width="150"
+    class="img-thumbnail">
+
+{% endif %}
         </div>
 
         <button class="btn btn-primary">
