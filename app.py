@@ -358,71 +358,17 @@ def login():
     # ---------------------------------------------------------------------
 # Forgot Password
 # ---------------------------------------------------------------------
-@app.route("/forgot-password", methods=["GET", "POST"])
-@limiter.limit("5 per hour")
-def forgot_password():
-
-    if request.method == "POST":
-
-        email = request.form.get("email", "").strip().lower()
-
-        success_message = (
-            "If an account exists for that email, "
-            "a password reset link has been sent."
-        )
-
-        user = User.query.filter_by(email=email).first()
-
-        if user:
-
-            token = generate_reset_token(user.email)
-
-            reset_url = url_for(
-                "reset_password",
-                token=token,
-                _external=True
-            )
-
-            msg = Message(
-                subject="Reset your Incubill password",
-                sender=app.config["MAIL_DEFAULT_SENDER"],
-                recipients=[user.email]
-            )
-
-            msg.body = f"""
-Hello,
-
-Someone requested a password reset for your Incubill account.
-
-Click the link below to reset your password:
-
-{reset_url}
-
-This link expires in 1 hour.
-
-If you didn't request this, you can safely ignore this email.
-
-Regards,
-Incubill
-"""
-
-            try:
-                mail.send(msg)
-
-                app.logger.info(
-                    f"Password reset email sent to {user.email}"
-                )
-
-            except Exception:
-                app.logger.exception(
-                    "Password reset email sending failed"
-                )
-
-        flash(success_message, "success")
-
-        return redirect(url_for("login"))
-
-    return render_template("forgot_password.html")
+try:
+    mail.send(msg)
+    app.logger.info(
+        "PASSWORD RESET EMAIL SENT: %s",
+        user.email
+    )
+except Exception:
+    app.logger.exception(
+        "PASSWORD RESET EMAIL FAILED: %s",
+        user.email
+    )
 
 
 # ---------------------------------------------------------------------
