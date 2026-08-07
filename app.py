@@ -358,18 +358,26 @@ def login():
     # ---------------------------------------------------------------------
 # Forgot Password
 # ---------------------------------------------------------------------
-try:
-    mail.send(msg)
-    app.logger.info(
-        "PASSWORD RESET EMAIL SENT: %s",
-        user.email
-    )
-except Exception:
-    app.logger.exception(
-        "PASSWORD RESET EMAIL FAILED: %s",
-        user.email
-    )
+        try:
+            mail.send(msg)
 
+            app.logger.info(
+                "PASSWORD RESET EMAIL SENT SUCCESSFULLY TO %s",
+                user.email
+            )
+
+        except Exception as e:
+            app.logger.exception(
+                "PASSWORD RESET EMAIL FAILED: %s",
+                e
+            )
+
+            flash(
+                "We could not send the password reset email. Please try again later.",
+                "error"
+            )
+
+            return redirect(url_for("forgot_password"))
 
 # ---------------------------------------------------------------------
 # Reset Password
