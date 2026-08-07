@@ -390,7 +390,7 @@ def forgot_password():
                 recipients=[user.email]
             )
 
-            msg.body = f"""
+        msg.body = f"""
 Hello,
 
 Someone requested a password reset for your Incubill account.
@@ -404,13 +404,17 @@ This link expires in 1 hour.
 If you didn't request this, you can safely ignore this email.
 """
 
-            try:
-                mail.send(msg)
-            except Exception as e:
-                app.logger.error(e)
+        try:
+            mail.send(msg)
+            app.logger.info(
+                f"Password reset email sent to {user.email}"
+            )
+        except Exception:
+            app.logger.exception(
+                "Password reset email sending failed"
+            )
 
         flash(success_message, "success")
-
         return redirect(url_for("login"))
 
     return render_template("forgot_password.html")
