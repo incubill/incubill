@@ -366,8 +366,6 @@ def forgot_password():
 
         email = request.form.get("email", "").strip().lower()
 
-        # Always show the same message to avoid revealing
-        # whether an email exists.
         success_message = (
             "If an account exists for that email, "
             "a password reset link has been sent."
@@ -386,11 +384,12 @@ def forgot_password():
             )
 
             msg = Message(
-                "Reset your Incubill password",
+                subject="Reset your Incubill password",
+                sender=app.config["MAIL_DEFAULT_SENDER"],
                 recipients=[user.email]
             )
 
-        msg.body = f"""
+            msg.body = f"""
 Hello,
 
 Someone requested a password reset for your Incubill account.
@@ -402,19 +401,25 @@ Click the link below to reset your password:
 This link expires in 1 hour.
 
 If you didn't request this, you can safely ignore this email.
+
+Regards,
+Incubill
 """
 
-        try:
-            mail.send(msg)
-            app.logger.info(
-                f"Password reset email sent to {user.email}"
-            )
-        except Exception:
-            app.logger.exception(
-                "Password reset email sending failed"
-            )
+            try:
+                mail.send(msg)
+
+                app.logger.info(
+                    f"Password reset email sent to {user.email}"
+                )
+
+            except Exception:
+                app.logger.exception(
+                    "Password reset email sending failed"
+                )
 
         flash(success_message, "success")
+
         return redirect(url_for("login"))
 
     return render_template("forgot_password.html")
