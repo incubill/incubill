@@ -401,21 +401,24 @@ Click the link below to reset your password:
 This link expires in 1 hour.
 
 If you didn't request this, you can safely ignore this email.
+
+Regards,
+Incubill
 """
 
-        try:
-            mail.send(msg)
+            try:
+                mail.send(msg)
 
-            app.logger.info(
-                "PASSWORD RESET EMAIL SENT SUCCESSFULLY TO %s",
-                user.email
-            )
+                app.logger.info(
+                    "PASSWORD RESET EMAIL SENT SUCCESSFULLY TO %s",
+                    user.email
+                )
 
-        except Exception as e:
-            app.logger.exception(
-                "PASSWORD RESET EMAIL FAILED: %s",
-                e
-            )
+            except Exception as e:
+                app.logger.exception(
+                    "PASSWORD RESET EMAIL FAILED: %s",
+                    e
+                )
 
         flash(success_message, "success")
         return redirect(url_for("login"))
