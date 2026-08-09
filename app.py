@@ -404,18 +404,18 @@ If you didn't request this, you can safely ignore this email.
 """
 
             try:
-                mail.send(msg)
+    mail.send(msg)
 
-                app.logger.info(
-                    "PASSWORD RESET EMAIL SENT SUCCESSFULLY TO %s",
-                    user.email
-                )
+    app.logger.info(
+        "PASSWORD RESET EMAIL SENT SUCCESSFULLY TO %s",
+        user.email
+    )
 
-            except Exception as e:
-                app.logger.exception(
-                    "PASSWORD RESET EMAIL FAILED: %s",
-                    e
-                )
+except Exception as e:
+    app.logger.exception(
+        "PASSWORD RESET EMAIL FAILED: %s",
+        e
+    )
 
         flash(success_message, "success")
         return redirect(url_for("login"))
