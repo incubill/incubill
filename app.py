@@ -389,6 +389,11 @@ def forgot_password():
                 recipients=[user.email]
             )
 
+            app.logger.info(
+    "PASSWORD RESET MESSAGE CREATED FOR %s",
+    user.email
+)
+
             msg.body = f"""
 Hello,
 
@@ -437,9 +442,15 @@ def reset_password(token):
         flash("This password reset link is invalid or has expired.", "error")
         return redirect(url_for("forgot_password"))
 
-    user = User.query.filter_by(email=email).first()
+   user = User.query.filter_by(email=email).first()
 
-    if not user:
+app.logger.info(
+    "PASSWORD RESET REQUEST: email=%s user_found=%s",
+    email,
+    user is not None
+)
+
+if user:
         flash("User not found.", "error")
         return redirect(url_for("forgot_password"))
 
