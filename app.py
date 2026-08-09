@@ -335,7 +335,12 @@ def home():
 @app.route("/login", methods=["GET", "POST"])
 @limiter.limit("10 per minute")
 def login():
+    if request.method == "POST":@app.route("/login", methods=["GET", "POST"])
+@limiter.limit("10 per minute")
+def login():
+
     if request.method == "POST":
+
         email = request.form.get("email", "").strip().lower()
         password = request.form.get("password", "")
 
