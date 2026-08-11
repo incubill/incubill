@@ -82,12 +82,20 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 # Email Configuration
 # -------------------------------
 
-app.config["MAIL_SERVER"] = os.getenv("MAIL_SERVER")
-app.config["MAIL_PORT"] = int(os.getenv("MAIL_PORT", 587))
-app.config["MAIL_USE_TLS"] = os.getenv("MAIL_USE_TLS", "True") == "True"
+app.config["MAIL_SERVER"] = os.getenv("MAIL_SERVER", "smtp.gmail.com")
+app.config["MAIL_PORT"] = int(os.getenv("MAIL_PORT", "587"))
+app.config["MAIL_USE_TLS"] = os.getenv("MAIL_USE_TLS", "True").lower() == "true"
+app.config["MAIL_USE_SSL"] = False
+
 app.config["MAIL_USERNAME"] = os.getenv("MAIL_USERNAME")
 app.config["MAIL_PASSWORD"] = os.getenv("MAIL_PASSWORD")
-app.config["MAIL_DEFAULT_SENDER"] = os.getenv("MAIL_DEFAULT_SENDER")
+
+app.config["MAIL_DEFAULT_SENDER"] = os.getenv(
+    "MAIL_DEFAULT_SENDER",
+    app.config["MAIL_USERNAME"]
+)
+
+mail = Mail(app)
 
 
 db = SQLAlchemy(app)
@@ -363,9 +371,7 @@ def login():
 @app.route("/forgot-password", methods=["GET", "POST"])
 @limiter.limit("5 per hour")
 def forgot_password():
-
     if request.method == "POST":
-
         email = request.form.get("email", "").strip().lower()
 
         success_message = (
@@ -376,7 +382,6 @@ def forgot_password():
         user = User.query.filter_by(email=email).first()
 
         if user:
-
             token = generate_reset_token(user.email)
 
             reset_url = url_for(
@@ -390,8 +395,6 @@ def forgot_password():
                 sender=app.config["MAIL_DEFAULT_SENDER"],
                 recipients=[user.email]
             )
-
-        
 
             msg.body = f"""
 Hello,
@@ -428,6 +431,7 @@ Incubill
         return redirect(url_for("login"))
 
     return render_template("forgot_password.html")
+
 
 # ---------------------------------------------------------------------
 # Reset Password
