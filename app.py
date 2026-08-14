@@ -381,6 +381,12 @@ def forgot_password():
 
         user = User.query.filter_by(email=email).first()
 
+        app.logger.info(
+            "PASSWORD RESET USER LOOKUP: email=%s user_found=%s",
+            email,
+            user is not None
+        )
+
         if user:
             token = generate_reset_token(user.email)
 
