@@ -1,0 +1,926 @@
+"""
+Incubill — Flask backend with real accounts + subscription gating
+====================================================================
+This replaces the static-site version. Now the estimate tool itself is
+only served to logged-in users whose subscription is active or in trial.
+
+ARCHITECTURE CHANGE FROM THE STATIC VERSION
+---------------------------------------------
+- GitHub Pages can only serve static files, so it can no longer host the
+  actual tool. This Flask app needs to run somewhere that executes Python
+  (Render, Railway, Fly.io, etc.) — see DEPLOY.md for step-by-step Render
+  instructions.
+- Checkout now uses Dodo's real checkout_sessions.create API (server-side,
+  with your secret API key) instead of the public static payment link,
+  because we need to attach each checkout to a specific logged-in user
+  (via customer email + metadata) so the webhook can update the right
+  account when payment succeeds.
+- A database now stores accounts and subscription status. This starter
+  uses SQLite by default (fine for local development) but you should
+  switch to Postgres for production — Render's free Postgres add-on works
+  well. Just change DATABASE_URL in your .env.
+
+SETUP
+-----
+1. Create a .env file (copy .env.example) with:
+     SECRET_KEY=<random string>
+     DODO_API_KEY=<your Dodo secret API key>
+     DODO_ENVIRONMENT=test_mode   # or live_mode
+     DODO_WEBHOOK_SECRET=<your Dodo webhook signing secret>
+     DODO_PRODUCT_ID_MONTHLY=pdt_0NixvmMnNF6ocQBAHH4t5
+     DODO_PRODUCT_ID_YEARLY=pdt_0Niznuz8H4ZBmVMPTpz3X
+     BASE_URL=https://incubill.com   # or http://localhost:5000 for local dev
+     DATABASE_URL=sqlite:///incubill.db
+2. pip install -r requirements.txt
+3. flask --app app init-db     (creates the database tables)
+4. python app.py
+5. In the Dodo Dashboard, point your webhook endpoint at:
+     https://your-domain/webhook/dodo
+   and copy the webhook signing secret into DODO_WEBHOOK_SECRET above.
+
+WEBHOOK SIGNATURE VERIFICATION
+-------------------------------
+Dodo Payments follows the Standard Webhooks spec. This file verifies
+signatures using the `standardwebhooks` package. Double-check the header
+names and secret format against Dodo's current webhook docs in your
+Dashboard (Settings -> Webhooks) — payment-provider webhook details can
+change, and a mismatch here would either reject legitimate webhooks or
+(worse) accept forged ones, so confirm this against the live docs before
+going to production with real payments.
+"""
+
+from werkzeug.utils import secure_filename
+import os
+import datetime
+from functools import wraps
+
+from flask import Flask, render_template, redirect, request, url_for, flash, jsonify
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import (
+    LoginManager, UserMixin, login_user, logout_user,
+    login_required, current_user,
+)
+from flask_wtf import CSRFProtect
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+from werkzeug.security import generate_password_hash, check_password_hash
+from dotenv import load_dotenv
+from dodopayments import DodoPayments
+from flask_mail import Mail, Message
+from itsdangerous import URLSafeTimedSerializer
+
+load_dotenv()
+
+app = Flask(__name__)
+app.config["UPLOAD_FOLDER"] = "static/uploads/logos"
+app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "change-me-in-production")
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///incubill.db")
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+
+# -------------------------------
+# Email Configuration
+# -------------------------------
+
+app.config["MAIL_SERVER"] = os.getenv("MAIL_SERVER", "smtp.gmail.com")
+app.config["MAIL_PORT"] = int(os.getenv("MAIL_PORT", "587"))
+app.config["MAIL_USE_TLS"] = os.getenv("MAIL_USE_TLS", "True").lower() == "true"
+app.config["MAIL_USE_SSL"] = False
+
+app.config["MAIL_USERNAME"] = os.getenv("MAIL_USERNAME")
+app.config["MAIL_PASSWORD"] = os.getenv("MAIL_PASSWORD")
+
+app.config["MAIL_DEFAULT_SENDER"] = os.getenv(
+    "MAIL_DEFAULT_SENDER",
+    app.config["MAIL_USERNAME"]
+)
+
+mail = Mail(app)
+
+
+db = SQLAlchemy(app)
+
+mail = Mail(app)
+
+serializer = URLSafeTimedSerializer(app.config["SECRET_KEY"])
+
+csrf = CSRFProtect(app)
+
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["200 per hour"]
+)
+
+login_manager = LoginManager(app)
+login_manager.login_view = "login"
+
+DODO_API_KEY = os.environ.get("DODO_API_KEY")
+DODO_ENVIRONMENT = os.environ.get("DODO_ENVIRONMENT", "test_mode")
+DODO_WEBHOOK_SECRET = os.environ.get("DODO_WEBHOOK_SECRET")
+DODO_PRODUCT_ID_MONTHLY = os.environ.get(
+    "DODO_PRODUCT_ID_MONTHLY",
+    "pdt_0NixvmMnNF6ocQBAHH4t5",
+)
+DODO_PRODUCT_ID_YEARLY = os.environ.get(
+    "DODO_PRODUCT_ID_YEARLY",
+    "pdt_0Niznuz8H4ZBmVMPTpz3X",
+)
+BASE_URL = os.environ.get("BASE_URL", "http://localhost:5000")
+
+# Only create the client when an API key exists.
+dodo_client = None
+if DODO_API_KEY:
+    dodo_client = DodoPayments(
+        bearer_token=DODO_API_KEY,
+        environment=DODO_ENVIRONMENT,
+    )
+else:
+    app.logger.warning("DODO_API_KEY is not configured.")
+
+
+# ---------------------------------------------------------------------
+# Models
+# ---------------------------------------------------------------------
+
+class User(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True)
+
+    email = db.Column(
+        db.String(255),
+        unique=True,
+        nullable=False,
+        index=True
+    )
+
+    phone = db.Column(
+        db.String(20),
+        unique=True,
+        nullable=False,
+        index=True
+    )
+
+    password_hash = db.Column(
+        db.String(255),
+        nullable=False
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        default=datetime.datetime.utcnow
+    )
+
+    trial_used = db.Column(
+        db.Boolean,
+        default=False,
+        nullable=False
+    )
+
+    dodo_customer_id = db.Column(
+        db.String(255),
+        nullable=True
+    )
+
+    subscription_id = db.Column(
+        db.String(255),
+        nullable=True
+    )
+
+    subscription_status = db.Column(
+        db.String(50),
+        default="none"
+    )
+
+    plan = db.Column(
+        db.String(20),
+        nullable=True
+    )
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+    def has_access(self):
+        return self.subscription_status in ("trialing", "active")
+
+
+class CompanyProfile(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        unique=True,
+        nullable=False
+    )
+
+    company_name = db.Column(db.String(200))
+    owner_name = db.Column(db.String(200))
+
+    email = db.Column(db.String(255))
+    phone = db.Column(db.String(20))
+
+    gst_number = db.Column(db.String(50))
+
+    address = db.Column(db.Text)
+
+    city = db.Column(db.String(100))
+    state = db.Column(db.String(100))
+    pincode = db.Column(db.String(20))
+
+    website = db.Column(db.String(255))
+
+    upi_id = db.Column(db.String(100))
+
+    bank_name = db.Column(db.String(150))
+    account_name = db.Column(db.String(150))
+    account_number = db.Column(db.String(100))
+    ifsc = db.Column(db.String(50))
+
+    logo = db.Column(db.String(255))
+
+    created_at = db.Column(
+        db.DateTime,
+        default=datetime.datetime.utcnow
+    )
+
+
+
+    # ---------------------------------------------------------------------
+# Password Reset Helpers
+# ---------------------------------------------------------------------
+
+def generate_reset_token(email):
+    return serializer.dumps(email, salt="password-reset")
+
+
+def verify_reset_token(token, expiration=3600):
+    try:
+        email = serializer.loads(
+            token,
+            salt="password-reset",
+            max_age=expiration
+        )
+        return email
+    except Exception:
+        return None
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return db.session.get(User, int(user_id))
+
+
+# ---------------------------------------------------------------------
+# Auto-create tables on startup.
+#
+# Render's free instance type has no Shell access, so `flask --app app
+# init-db` can't be run manually there. db.create_all() only creates
+# tables that don't already exist (safe to run on every boot/redeploy)
+# and gunicorn imports this module once per worker, so this runs
+# automatically whenever the app starts — no manual step needed.
+# The `init-db` CLI command below still works too, for local dev or on
+# a paid Render instance with Shell access.
+# ---------------------------------------------------------------------
+with app.app_context():
+    db.create_all()
+
+
+# ---------------------------------------------------------------------
+# Auth routes
+# ---------------------------------------------------------------------
+
+@app.route("/signup", methods=["GET", "POST"])
+@limiter.limit("10 per hour")
+def signup():
+
+    if request.method == "POST":
+
+        email = request.form["email"].strip().lower()
+        phone = request.form["phone"].strip()
+        password = request.form["password"]
+
+        existing_phone = User.query.filter_by(phone=phone).first()
+
+        if existing_phone:
+            flash(
+                "This mobile number has already been used for a free trial.",
+                "error"
+            )
+            return render_template("signup.html")
+
+        if not email or not phone or not password:
+            flash("All fields are required.", "error")
+            return render_template("signup.html")
+
+        if User.query.filter_by(email=email).first():
+            flash("An account with that email already exists.", "error")
+            return render_template("signup.html")
+
+        user = User(
+            email=email,
+            phone=phone,
+            trial_used=True
+        )
+
+        user.set_password(password)
+
+        db.session.add(user)
+        db.session.commit()
+
+        login_user(user)
+
+        return redirect(url_for("subscribe"))
+
+    return render_template("signup.html")
+
+@app.route("/")
+def home():
+    return render_template("home.html")
+
+@app.route("/login", methods=["GET", "POST"])
+@limiter.limit("10 per minute")
+def login():
+
+    if request.method == "POST":
+
+        email = request.form.get("email", "").strip().lower()
+        password = request.form.get("password", "")
+
+        user = User.query.filter_by(email=email).first()
+
+        if user is None or not user.check_password(password):
+            flash("Invalid email or password.", "error")
+            return render_template("login.html")
+
+        login_user(user)
+
+        if user.has_access():
+            return redirect(url_for("app_home"))
+
+        return redirect(url_for("subscribe"))
+
+    return render_template("login.html")
+
+
+    # ---------------------------------------------------------------------
+# Forgot Password
+# ---------------------------------------------------------------------
+@app.route("/forgot-password", methods=["GET", "POST"])
+@limiter.limit("5 per hour")
+def forgot_password():
+    if request.method == "POST":
+        email = request.form.get("email", "").strip().lower()
+
+        success_message = (
+            "If an account exists for that email, "
+            "a password reset link has been sent."
+        )
+
+       user = User.query.filter_by(email=email).first()
+
+app.logger.info(
+    "PASSWORD RESET USER LOOKUP: email=%s user_found=%s",
+    email,
+    user is not None
+)
+
+if user:
+            token = generate_reset_token(user.email)
+
+            reset_url = url_for(
+                "reset_password",
+                token=token,
+                _external=True
+            )
+
+            msg = Message(
+                subject="Reset your Incubill password",
+                sender=app.config["MAIL_DEFAULT_SENDER"],
+                recipients=[user.email]
+            )
+
+            msg.body = f"""
+Hello,
+
+Someone requested a password reset for your Incubill account.
+
+Click the link below to reset your password:
+
+{reset_url}
+
+This link expires in 1 hour.
+
+If you didn't request this, you can safely ignore this email.
+
+Regards,
+Incubill
+"""
+
+            try:
+                mail.send(msg)
+
+                app.logger.info(
+                    "PASSWORD RESET EMAIL SENT SUCCESSFULLY TO %s",
+                    user.email
+                )
+
+            except Exception as e:
+                app.logger.exception(
+                    "PASSWORD RESET EMAIL FAILED: %s",
+                    e
+                )
+
+        flash(success_message, "success")
+        return redirect(url_for("login"))
+
+    return render_template("forgot_password.html")
+
+
+# ---------------------------------------------------------------------
+# Reset Password
+# ---------------------------------------------------------------------
+
+@app.route("/reset-password/<token>", methods=["GET", "POST"])
+def reset_password(token):
+
+    email = verify_reset_token(token)
+
+    if not email:
+        flash(
+            "This password reset link is invalid or has expired.",
+            "error"
+        )
+        return redirect(url_for("forgot_password"))
+
+    user = User.query.filter_by(email=email).first()
+
+    if not user:
+        flash("User not found.", "error")
+        return redirect(url_for("forgot_password"))
+
+    if request.method == "POST":
+
+        password = request.form.get("password", "")
+        confirm_password = request.form.get("confirm_password", "")
+
+        if password != confirm_password:
+            flash("Passwords do not match.", "error")
+            return render_template("reset_password.html")
+
+        if len(password) < 8:
+            flash("Password must be at least 8 characters.", "error")
+            return render_template("reset_password.html")
+
+        user.set_password(password)
+
+        db.session.commit()
+
+        flash(
+            "Your password has been reset successfully. Please log in.",
+            "success"
+        )
+
+        return redirect(url_for("login"))
+
+    return render_template("reset_password.html")
+
+
+# ---------------------------------------------------------------------
+# Subscription gating
+# ---------------------------------------------------------------------
+
+def subscription_required(view_func):
+
+    @wraps(view_func)
+    @login_required
+
+    def wrapped(*args, **kwargs):
+
+        if not current_user.has_access():
+
+            return redirect(url_for("subscribe"))
+
+        return view_func(*args, **kwargs)
+
+    return wrapped
+
+
+# ---------------------------------------------------------------------
+# Subscribe
+# ---------------------------------------------------------------------
+
+@app.route("/subscribe")
+@login_required
+def subscribe():
+
+    if current_user.has_access():
+
+        return redirect(url_for("app_home"))
+
+    return render_template("subscribe.html")
+
+
+# ---------------------------------------------------------------------
+# Create Checkout
+# ---------------------------------------------------------------------
+
+@app.route("/create-checkout/<plan>")
+@login_required
+def create_checkout(plan):
+
+    if plan == "yearly":
+        product_id = DODO_PRODUCT_ID_YEARLY
+    else:
+        product_id = DODO_PRODUCT_ID_MONTHLY
+
+    try:
+
+        session = dodo_client.checkout_sessions.create(
+
+            product_cart=[
+                {
+                    "product_id": product_id,
+                    "quantity": 1
+                }
+            ],
+
+            customer={
+                "email": current_user.email
+            },
+
+            metadata={
+                "user_id": str(current_user.id)
+            },
+
+            return_url=f"{BASE_URL}/payment-success"
+
+        )
+
+        app.logger.info(
+            f"Checkout created for {current_user.email}"
+        )
+
+        app.logger.info(
+            session.checkout_url
+        )
+
+        return redirect(session.checkout_url)
+
+    except Exception as exc:
+
+        app.logger.exception(exc)
+
+        flash(
+            "Unable to start checkout. Please try again.",
+            "error"
+        )
+
+        return redirect(
+            url_for("subscribe")
+        )
+
+
+# ---------------------------------------------------------------------
+# Payment Success
+# ---------------------------------------------------------------------
+
+@app.route("/payment-success")
+@login_required
+def payment_success():
+
+    flash(
+        "Payment received. Your subscription will activate within a few seconds.",
+        "success"
+    )
+
+    return render_template(
+        "payment_success.html"
+    )
+
+
+# ---------------------------------------------------------------------
+# AJAX Subscription Status
+# ---------------------------------------------------------------------
+
+@app.route("/subscription-status")
+@login_required
+def subscription_status():
+
+    db.session.refresh(current_user)
+
+    return jsonify({
+
+        "active": current_user.has_access(),
+
+        "status": current_user.subscription_status
+
+    })
+
+# ---------------------------------------------------------------------
+# Dodo Webhook
+# ---------------------------------------------------------------------
+
+@app.route("/webhook/dodo", methods=["POST"])
+@csrf.exempt
+def dodo_webhook():
+
+    payload = request.get_data()
+
+    headers = request.headers
+
+    try:
+
+        from standardwebhooks.webhooks import Webhook
+
+        wh = Webhook(DODO_WEBHOOK_SECRET)
+
+        wh.verify(
+            payload,
+            {
+                "webhook-id": headers.get("webhook-id", ""),
+                "webhook-timestamp": headers.get("webhook-timestamp", ""),
+                "webhook-signature": headers.get("webhook-signature", ""),
+            },
+        )
+
+    except Exception as exc:
+
+        app.logger.exception(exc)
+
+        return jsonify({"error": "Invalid webhook signature"}), 400
+
+    event = request.get_json(silent=True) or {}
+
+    app.logger.info("=" * 80)
+    app.logger.info("DODO WEBHOOK RECEIVED")
+    app.logger.info(event)
+    app.logger.info("=" * 80)
+
+    event_type = event.get("type", "")
+
+    data = event.get("data", {}) or {}
+
+    metadata = (
+        data.get("metadata")
+        or data.get("subscription", {}).get("metadata")
+        or {}
+    )
+
+    customer = (
+        data.get("customer")
+        or data.get("subscription", {}).get("customer")
+        or {}
+    )
+
+    app.logger.info(f"Event Type: {event_type}")
+    app.logger.info(f"Metadata: {metadata}")
+    app.logger.info(f"Customer: {customer}")
+
+    user = None
+
+    if metadata.get("user_id"):
+
+        try:
+
+            user = db.session.get(
+                User,
+                int(metadata["user_id"])
+            )
+
+        except Exception:
+
+            app.logger.exception(
+                "Invalid metadata user_id"
+            )
+
+    if user is None:
+
+        email = customer.get("email")
+
+        if email:
+
+            user = User.query.filter_by(
+                email=email.strip().lower()
+            ).first()
+
+    if user is None:
+
+        app.logger.error("USER NOT FOUND")
+
+        app.logger.error(event)
+
+        return jsonify(
+            {
+                "status": "ignored",
+                "reason": "user_not_found",
+            }
+        ), 200
+
+    if event_type in (
+
+        "subscription.active",
+
+        "subscription.updated",
+
+        "subscription.renewed",
+
+        "payment.succeeded",
+
+    ):
+
+        user.subscription_status = "active"
+
+        user.subscription_id = (
+
+            data.get("subscription_id")
+
+            or data.get("subscription", {}).get("subscription_id")
+
+            or user.subscription_id
+
+        )
+
+        user.dodo_customer_id = (
+
+            customer.get("customer_id")
+
+            or customer.get("id")
+
+            or user.dodo_customer_id
+
+        )
+
+    elif event_type == "subscription.trialing":
+
+        user.subscription_status = "trialing"
+
+    elif event_type in (
+
+        "subscription.cancelled",
+
+        "subscription.expired",
+
+    ):
+
+        user.subscription_status = "canceled"
+
+    elif event_type == "payment.failed":
+
+        user.subscription_status = "past_due"
+
+    db.session.commit()
+
+    app.logger.info(
+        f"Subscription updated successfully for "
+        f"{user.email} -> {user.subscription_status}"
+    )
+
+    return jsonify(
+        {
+            "status": "processed"
+        }
+    ), 200
+
+    # ---------------------------------------------------------------------
+# CLI Helper
+# ---------------------------------------------------------------------
+
+@app.cli.command("create-admin")
+def create_admin():
+    """
+    Creates an admin user if one doesn't already exist.
+    """
+
+    email = input("Admin Email: ").strip().lower()
+    password = input("Password: ").strip()
+
+    existing = User.query.filter_by(email=email).first()
+
+    if existing:
+        print("User already exists.")
+        return
+
+    admin = User(email=email)
+    admin.set_password(password)
+
+    # If your User model has an is_admin field, uncomment this:
+    # admin.is_admin = True
+
+    db.session.add(admin)
+    db.session.commit()
+
+    print("Admin created successfully.")
+
+
+# ---------------------------------------------------------------------
+# Health Check
+# ---------------------------------------------------------------------
+
+@app.route("/health")
+def health():
+    return jsonify({
+        "status": "ok"
+    })
+
+
+# ---------------------------------------------------------------------
+# Legal Pages
+# ---------------------------------------------------------------------
+
+@app.route("/terms")
+def terms():
+    return render_template("terms.html")
+
+
+@app.route("/privacy")
+def privacy():
+    return render_template("privacy.html")
+
+
+# ---------------------------------------------------------------------
+# Error Pages
+# ---------------------------------------------------------------------
+
+@app.errorhandler(404)
+def page_not_found(error):
+    return render_template("404.html"), 404
+
+
+@app.errorhandler(500)
+def server_error(error):
+    db.session.rollback()
+    return render_template("500.html"), 500
+
+
+@app.route("/")
+def index():
+    return redirect(url_for("login"))
+
+
+# ---------------------------------------------------------------------
+# Run Application
+# ---------------------------------------------------------------------
+@app.route("/company-profile", methods=["GET", "POST"])
+@login_required
+def company_profile():
+
+    profile = CompanyProfile.query.filter_by(
+        user_id=current_user.id
+    ).first()
+
+    if not profile:
+        profile = CompanyProfile(user_id=current_user.id)
+        db.session.add(profile)
+
+    if request.method == "POST":
+
+        profile.company_name = request.form.get("company_name")
+        profile.owner_name = request.form.get("owner_name")
+
+        profile.email = request.form.get("email")
+        profile.phone = request.form.get("phone")
+
+        profile.gst_number = request.form.get("gst_number")
+
+        profile.address = request.form.get("address")
+
+        profile.city = request.form.get("city")
+        profile.state = request.form.get("state")
+        profile.pincode = request.form.get("pincode")
+
+        profile.website = request.form.get("website")
+
+        profile.upi_id = request.form.get("upi_id")
+
+        profile.bank_name = request.form.get("bank_name")
+        profile.account_name = request.form.get("account_name")
+        profile.account_number = request.form.get("account_number")
+        profile.ifsc = request.form.get("ifsc")
+
+        db.session.commit()
+
+        flash("Company profile saved successfully.", "success")
+
+        return redirect(url_for("company_profile"))
+
+    return render_template(
+        "company_profile.html",
+        profile=profile
+    )
+
+@app.route("/routes")
+def routes():
+    return "<br>".join(
+        sorted(str(rule) for rule in app.url_map.iter_rules())
+    )
+
+if __name__ == "__main__":
+    app.run(
+        host="0.0.0.0",
+        port=int(os.environ.get("PORT", 5000)),
+        debug=True,
+    )
+
