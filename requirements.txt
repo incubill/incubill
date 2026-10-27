@@ -10,3 +10,4 @@ gunicorn
 psycopg2-binary
 Flask-Mail==0.10.0
 itsdangerous==2.2.0
+psycopg[binary]
